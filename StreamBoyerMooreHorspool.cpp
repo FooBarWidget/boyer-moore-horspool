@@ -26,12 +26,26 @@
  * be in memory. In contrast, this implementation allows one to feed the haystack data
  * piece-of-piece in a "streaming" manner.
  *
- * This implementation is optimized for both speed and memory usage. Other than the
- * memory needed for the context structure, it does not need any additional memory
- * allocations (except for minimal usage of the stack). The context structure, which
- * contains the Boyer-Moore-Horspool occurance table and various state information,
- * is is organized in such a way that it can be allocated with a single memory
- * allocation action, regardless of the length of the needle.
+ * This implementation is optimized for both speed and memory usage.
+ * Other than the memory needed for the context structure, it does not need any
+ * additional memory allocations (except for minimal usage of the stack). The context
+ * structure, which contains the Boyer-Moore-Horspool occurance table and various
+ * state information, is is organized in such a way that it can be allocated with a
+ * single memory allocation action, regardless of the length of the needle.
+ * Its inner loop also deviates a little bit from the original algorithm: the original
+ * algorithm matches data right-to-left, but this implementation first matches the
+ * rightmost character, then matches the data left-to-right, thereby incorporating
+ * some ideas from "Tuning the Boyer-Moore-Horspool String Searching Algorithm" by
+ * Timo Raita, 1992. It uses memcmp() for this left-to-right match which is typically
+ * heavily optimized.
+ *
+ * A few more notes:
+ * - This code can be used for searching an arbitrary binary needle in an arbitrary binary
+ *   haystack. It is not limited to text.
+ * - Boyer-Moore-Horspool works best for long needles. Generally speaking, the longer the
+ *   needle the faster the algorithm becomes. Thus, this implementation makes no effort
+ *   to be fast at searching single-character needles. You should just use memchr() for
+ *   that which will probably be *much* faster than this code.
  *
  * Usage:
  *
