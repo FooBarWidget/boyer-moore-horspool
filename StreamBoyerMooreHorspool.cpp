@@ -44,8 +44,11 @@
  *   haystack. It is not limited to text.
  * - Boyer-Moore-Horspool works best for long needles. Generally speaking, the longer the
  *   needle the faster the algorithm becomes. Thus, this implementation makes no effort
- *   to be fast at searching single-character needles. You should just use memchr() for
- *   that which will probably be *much* faster than this code.
+ *   at being fast at searching single-character needles or even short needles (say,
+ *   less than 5 characters). You should just use memchr() and memmem() for that; those
+ *   functions are usually heavily optimized (e.g. by using tricks like searching 4 bytes
+ *   at the same time by treating data as an array of integers) and will probably be
+ *   *much* faster than this code at searching short needles.
  * - You can further tweak this code to favor either memory usage or performance.
  *   See the typedef for sbmh_size_t for more information.
  *
