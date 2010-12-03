@@ -100,6 +100,10 @@
  * SBMH_SIZE(new_needle_len) bytes big.
  */
 
+/* This implementation is based on sample code originally written by Joel
+ * Yliluoma <joel.yliluoma@iki.fi>, licensed under MIT.
+ */
+
 // We assume that other compilers support the 'restrict' keyword.
 #ifdef __GNUC__
 	#ifndef G_GNUC_RESTRICT
