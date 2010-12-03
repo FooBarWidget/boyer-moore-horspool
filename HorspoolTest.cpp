@@ -63,6 +63,14 @@ namespace tut {
 		ensure_equals(find("hello world", ""), -1);
 	}
 	
+	TEST_METHOD(5) {
+		set_test_name("Searching for a needle that's larger than the haystack always fails");
+		
+		ensure_equals(find("ab", "a"), -1);
+		ensure_equals(find("hello", "hm"), -1);
+		ensure_equals(find("hello my world!", "this is small"), -1);
+	}
+	
 	
 	TEST_METHOD(10) {
 		set_test_name("It returns the position a which the needle is first found (1 character needle)");

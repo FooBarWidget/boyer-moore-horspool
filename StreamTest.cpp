@@ -1,6 +1,7 @@
 #include <string>
 #include <algorithm>
 #include <alloca.h>
+#include <fstream>
 
 #include "tut.h"
 #include "StreamBoyerMooreHorspool.cpp"
@@ -82,6 +83,14 @@ namespace tut {
 		ensure_equals(find("1", ""), -1);
 		ensure_equals(find("abc", ""), -1);
 		ensure_equals(find("hello world", ""), -1);
+	}
+	
+	TEST_METHOD(5) {
+		set_test_name("Searching for a needle that's larger than the haystack always fails");
+		
+		ensure_equals(find("ab", "a"), -1);
+		ensure_equals(find("hello", "hm"), -1);
+		ensure_equals(find("hello my world!", "this is small"), -1);
 	}
 	
 	
@@ -180,6 +189,14 @@ namespace tut {
 		ensure_equals(feed_in_chunks_and_find("hello world", ""), -1);
 	}
 	
+	TEST_METHOD(25) {
+		set_test_name("Searching for a needle that's larger than the haystack always fails");
+		
+		ensure_equals(feed_in_chunks_and_find("ab", "a"), -1);
+		ensure_equals(feed_in_chunks_and_find("hello", "hm"), -1);
+		ensure_equals(feed_in_chunks_and_find("hello my world!", "this is small"), -1);
+	}
+	
 	
 	TEST_METHOD(30) {
 		set_test_name("It returns the position a which the needle is first found (1 character needle)");
@@ -275,6 +292,14 @@ namespace tut {
 		ensure_equals(feed_in_chunks_and_find("1", "", 3), -1);
 		ensure_equals(feed_in_chunks_and_find("abc", "", 3), -1);
 		ensure_equals(feed_in_chunks_and_find("hello world", "", 3), -1);
+	}
+	
+	TEST_METHOD(45) {
+		set_test_name("Searching for a needle that's larger than the haystack always fails");
+		
+		ensure_equals(feed_in_chunks_and_find("ab", "a", 3), -1);
+		ensure_equals(feed_in_chunks_and_find("hello", "hm", 3), -1);
+		ensure_equals(feed_in_chunks_and_find("hello my world!", "this is small", 3), -1);
 	}
 	
 	
