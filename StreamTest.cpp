@@ -16,7 +16,7 @@ namespace tut {
 				(const unsigned char *) needle.c_str(), needle.size(),
 				(const unsigned char *) haystack.c_str(), haystack.size());
 			if (ctx->done) {
-				return ctx->consumed;
+				return ctx->consumed - needle.size();
 			} else {
 				return -1;
 			}
