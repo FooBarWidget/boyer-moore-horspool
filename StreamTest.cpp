@@ -17,7 +17,7 @@ namespace tut {
 				(const unsigned char *) needle.c_str(), needle.size(),
 				(const unsigned char *) haystack.c_str(), haystack.size());
 			if (ctx->found) {
-				return ctx->consumed - needle.size();
+				return ctx->analyzed - needle.size();
 			} else {
 				return -1;
 			}
@@ -35,7 +35,7 @@ namespace tut {
 			}
 			
 			if (ctx->found) {
-				return ctx->consumed - needle.size();
+				return ctx->analyzed - needle.size();
 			} else {
 				return -1;
 			}

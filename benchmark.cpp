@@ -304,9 +304,9 @@ main(int argc, char *argv[]) {
 		sbmh_init(ctx, needle, needle_len);
 		sbmh_feed(ctx, needle, needle_len, (const unsigned char *) data.c_str(), data.size());
 		if (ctx->found) {
-			found = ctx->consumed - needle_len;
+			found = ctx->analyzed - needle_len;
 		} else {
-			found = ctx->consumed;
+			found = ctx->analyzed;
 		}
 	}
 	t2 = getTime();

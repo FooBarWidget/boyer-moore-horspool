@@ -1,3 +1,84 @@
+/*
+ * Copyright (c) 2010 Phusion v.o.f.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+/*
+ * Boyer-Moore-Horspool string search algorithm implementation with streaming support.
+ * Most string search algorithm implementations require the entire haystack data to
+ * be in memory. In contrast, this implementation allows one to feed the haystack data
+ * piece-of-piece in a "streaming" manner.
+ *
+ * This implementation is optimized for both speed and memory usage. Other than the
+ * memory needed for the context structure, it does not need any additional memory
+ * allocations (except for minimal usage of the stack). The context structure, which
+ * contains the Boyer-Moore-Horspool occurance table and various state information,
+ * is is organized in such a way that it can be allocated with a single memory
+ * allocation action, regardless of the length of the needle.
+ *
+ * Usage:
+ *
+ * 1. Allocate a StreamBMH structure either on the stack (alloca) or on the heap.
+ *    It must be at least SBMH_SIZE(needle_len) bytes big.
+ *    Do not write to any of StreamBMH's field: they are considered read-only except
+ *    for the implementation code.
+ *
+ * 2. Initialize the structure with sbmh_init(). This structure is now usable for
+ *    searching the given needle, and only the given needle.
+ *    You must ensure that the StreamBMH structure has at least SBMH_SIZE(needle_len)
+ *    bytes of space, otherwise sbmh_init() will overwrite too much memory.
+ *    sbmh_init() does NOT make a copy of the needle data.
+ *
+ * 3. Feed haystack data using sbmh_feed(). You must pass it the same needle that you
+ *    passed to sbmh_init(). We do not store a pointer to the needle passed to
+ *    sbmh_init() for memory efficiency reasons: the caller already has a pointer
+ *    to the needle data so there's no need for us to store it.
+ *
+ *    sbmh_feed() returns the number of bytes that has been analyzed:
+ *
+ *    - If the needle has now been found then the position of the last needle character
+ *      in the currently fed data will be returned: all data until the end of the needle
+ *      has been analyzed, but no more. Additionally, the 'found' field in the context
+ *      structure will be set to true.
+ *    - If the needle hasn't been found yet, then the size of the currently fed data
+ *      will be returned: all fed data has been analyzed.
+ *    - If the needle was already found, then any additional call to sbmh_feed()
+ *      will cause it to return 0: nothing in the fed data is analyzed.
+ *
+ * The 'analyzed' field is used to keep track of the total number of haystack bytes that
+ * have been analyzed so far, including those haystack data fed in previous sbmh_feed()
+ * calls.
+ *
+ * There's no need deinitialize the StreamBMH structure. Just free its memory.
+ *
+ * You can also reuse the StreamBMH structure to find the same needle in a different
+ * haystack. Call sbmh_reset() to reset all of its internal state except for the
+ * Boyer-Moore-Horspool occurance table which contains needle-specific preparation data.
+ * You can then call sbmh_feed() to analyze haystack data.
+ *
+ * Finally, you can reuse an existing StreamBMH structure for finding a different
+ * needle. Call sbmh_init() to re-initialize it for use with a different needle.
+ * However you must make sure that the StreamBMH structure is at least
+ * SBMH_SIZE(new_needle_len) bytes big.
+ */
+
 // We assume that other compilers support the 'restrict' keyword.
 #ifdef __GNUC__
 	#ifndef G_GNUC_RESTRICT
@@ -29,7 +110,7 @@
 typedef unsigned short sbmh_size_t;
 
 struct StreamBMH {
-	size_t        consumed;
+	size_t        analyzed;
 	bool          found;
 	sbmh_size_t   lookbehind_size;
 	sbmh_size_t   occ[256];
@@ -43,7 +124,7 @@ struct StreamBMH {
 void
 sbmh_reset(struct StreamBMH *restrict ctx) {
 	ctx->found = false;
-	ctx->consumed = 0;
+	ctx->analyzed = 0;
 	ctx->lookbehind_size = 0;
 }
 
@@ -143,7 +224,7 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 			 && sbmh_memcmp(ctx, needle, data, pos, needle_len - 1)) {
 				ctx->found = true;
 				ctx->lookbehind_size = 0;
-				ctx->consumed += pos + needle_len;
+				ctx->analyzed += pos + needle_len;
 				return pos + needle_len;
 			} else {
 				pos += ctx->occ[ch];
@@ -170,7 +251,7 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 			memcpy(ctx->lookbehind + ctx->lookbehind_size,
 				data, len);
 			ctx->lookbehind_size += len;
-			ctx->consumed += len;
+			ctx->analyzed += len;
 			return len;
 		}
 	}
@@ -187,7 +268,7 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		     && unlikely( memcmp(needle, data + pos, needle_len - 1) == 0 )
 		)) {
 			ctx->found = true;
-			ctx->consumed += pos + needle_len;
+			ctx->analyzed += pos + needle_len;
 			return pos + needle_len;
 		} else {
 			pos += occ[ch];
@@ -202,6 +283,6 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		ctx->lookbehind_size = len - pos;
 	}
 	
-	ctx->consumed += len;
+	ctx->analyzed += len;
 	return len;
 }
