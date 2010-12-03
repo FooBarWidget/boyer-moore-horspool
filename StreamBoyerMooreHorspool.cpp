@@ -29,8 +29,8 @@
 typedef unsigned short sbmh_size_t;
 
 struct StreamBMH {
-	bool          found;
 	size_t        consumed;
+	bool          found;
 	sbmh_size_t   lookbehind_size;
 	sbmh_size_t   occ[256];
 	// Algorithm uses at most needle_len - 1 bytes of space in lookbehind buffer.

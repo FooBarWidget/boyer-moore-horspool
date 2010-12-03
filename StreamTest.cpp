@@ -1,7 +1,6 @@
 #include <string>
 #include <algorithm>
 #include <alloca.h>
-#include <fstream>
 
 #include "tut.h"
 #include "StreamBoyerMooreHorspool.cpp"
