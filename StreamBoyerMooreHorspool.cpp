@@ -46,6 +46,8 @@
  *   needle the faster the algorithm becomes. Thus, this implementation makes no effort
  *   to be fast at searching single-character needles. You should just use memchr() for
  *   that which will probably be *much* faster than this code.
+ * - You can further tweak this code to favor either memory usage or performance.
+ *   See the typedef for sbmh_size_t for more information.
  *
  * Usage:
  *
@@ -53,6 +55,8 @@
  *    It must be at least SBMH_SIZE(needle_len) bytes big.
  *    Do not write to any of StreamBMH's field: they are considered read-only except
  *    for the implementation code.
+ *    The maximum supported needle size depends on the definition of sbmh_size_t. See
+ *    its typedef for more information.
  *
  * 2. Initialize the structure with sbmh_init(). This structure is now usable for
  *    searching the given needle, and only the given needle.
@@ -121,6 +125,19 @@
 #include <cassert>
 
 
+/*
+ * sbmh_size_t is a type for representing the needle length. It should be unsigned;
+ * it makes no sense for it not to be.
+ * By default it's typedef'ed to 'unsigned short', which is a 16-bit integer on most
+ * platforms, allowing us to support needles up to about 64 KB. This ough to be enough
+ * for most people. In the odd situation that you're dealing with extremely large
+ * needles, you can typedef this to 'unsigned int' or even 'unsigned long long'.
+ *
+ * Its typedef slightly affects performance. Benchmarks on OS X Snow Leopard (x86_64)
+ * have shown that typedeffing this to size_t (64-bit integer) makes the benchmark
+ * 4-8% faster at the cost of 4 times more memory usage per StreamBMH structure.
+ * Consider changing the typedef depending on your needs.
+ */
 typedef unsigned short sbmh_size_t;
 
 struct StreamBMH {
@@ -183,7 +200,7 @@ sbmh_memcmp(const struct StreamBMH *restrict ctx,
 {
 	ssize_t i = 0;
 	
-	while (i < len) {
+	while (i < ssize_t(len)) {
 		unsigned char data_ch = sbmh_lookup_char(ctx, data, pos + i);
 		unsigned char needle_ch = needle[i];
 		
@@ -261,7 +278,7 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 				ctx->lookbehind_size - bytesToCutOff);
 			ctx->lookbehind_size -= bytesToCutOff;
 			
-			assert(ctx->lookbehind_size + len < needle_len);
+			assert(ssize_t(ctx->lookbehind_size + len) < ssize_t(needle_len));
 			memcpy(ctx->lookbehind + ctx->lookbehind_size,
 				data, len);
 			ctx->lookbehind_size += len;
