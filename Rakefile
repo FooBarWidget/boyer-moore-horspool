@@ -1,7 +1,15 @@
-verbose false
+CXXFLAGS = "-Wall -g"
 
-file 'test' => 'test.cpp' do
-	sh "g++ -Wall test.cpp -o test -O2"
+file 'HorspoolTest.o' => ['HorspoolTest.cpp', 'Horspool.cpp'] do
+	sh "g++ #{CXXFLAGS} -c HorspoolTest.cpp -o HorspoolTest.o"
+end
+
+file 'TestMain.o' => 'TestMain.cpp' do
+	sh "g++ #{CXXFLAGS} -c TestMain.cpp -o TestMain.o"
+end
+
+file 'test' => ['HorspoolTest.o', 'TestMain.o'] do
+	sh "g++ #{CXXFLAGS} HorspoolTest.o TestMain.o -o test"
 end
 
 def benchmark(haystack_title, haystack_file, needle = "I have control\n", iterations = 10)
