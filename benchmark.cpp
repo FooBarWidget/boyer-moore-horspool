@@ -303,7 +303,7 @@ main(int argc, char *argv[]) {
 	for (i = 0; i < iterations; i++) {
 		sbmh_init(ctx, needle, needle_len);
 		sbmh_feed(ctx, needle, needle_len, (const unsigned char *) data.c_str(), data.size());
-		if (ctx->done) {
+		if (ctx->found) {
 			found = ctx->consumed - needle_len;
 		} else {
 			found = ctx->consumed;

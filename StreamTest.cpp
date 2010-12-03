@@ -17,7 +17,7 @@ namespace tut {
 			sbmh_feed(ctx,
 				(const unsigned char *) needle.c_str(), needle.size(),
 				(const unsigned char *) haystack.c_str(), haystack.size());
-			if (ctx->done) {
+			if (ctx->found) {
 				return ctx->consumed - needle.size();
 			} else {
 				return -1;
@@ -35,7 +35,7 @@ namespace tut {
 					std::min((int) chunkSize, (int) (haystack.size() - i)));
 			}
 			
-			if (ctx->done) {
+			if (ctx->found) {
 				return ctx->consumed - needle.size();
 			} else {
 				return -1;

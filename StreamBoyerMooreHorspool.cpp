@@ -29,8 +29,8 @@
 typedef unsigned short sbmh_size_t;
 
 struct StreamBMH {
-	bool          done;
-	sbmh_size_t   consumed;
+	bool          found;
+	size_t        consumed;
 	sbmh_size_t   lookbehind_size;
 	sbmh_size_t   occ[256];
 	// Algorithm uses at most needle_len - 1 bytes of space in lookbehind buffer.
@@ -42,7 +42,7 @@ struct StreamBMH {
 
 void
 sbmh_reset(struct StreamBMH *restrict ctx) {
-	ctx->done = false;
+	ctx->found = false;
 	ctx->consumed = 0;
 	ctx->lookbehind_size = 0;
 }
@@ -106,7 +106,7 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 	const unsigned char *restrict needle, sbmh_size_t needle_len,
 	const unsigned char *restrict data, size_t len)
 {
-	if (ctx->done) {
+	if (ctx->found) {
 		return 0;
 	}
 	
@@ -141,7 +141,7 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 			
 			if (ch == last_needle_char
 			 && sbmh_memcmp(ctx, needle, data, pos, needle_len - 1)) {
-				ctx->done = true;
+				ctx->found = true;
 				ctx->lookbehind_size = 0;
 				ctx->consumed += pos + needle_len;
 				return pos + needle_len;
@@ -186,8 +186,8 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		        unlikely( ch == last_needle_char )
 		     && unlikely( memcmp(needle, data + pos, needle_len - 1) == 0 )
 		)) {
-			ctx->done = true;
-			ctx->consumed  += pos + needle_len;
+			ctx->found = true;
+			ctx->consumed += pos + needle_len;
 			return pos + needle_len;
 		} else {
 			pos += occ[ch];
