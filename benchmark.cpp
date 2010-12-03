@@ -299,8 +299,8 @@ main(int argc, char *argv[]) {
 	printf("Boyer-Moore-Horspool: found at position %d in %d msec\n", int(found), int(t2 - t1));
 	
 	t1 = getTime();
+	StreamBMH *ctx = (StreamBMH *) alloca(SBMH_SIZE(needle_len));
 	for (i = 0; i < iterations; i++) {
-		StreamBMH *ctx = (StreamBMH *) alloca(SBMH_SIZE(needle_len));
 		sbmh_init(ctx, needle, needle_len);
 		sbmh_feed(ctx, needle, needle_len, (const unsigned char *) data.c_str(), data.size());
 		if (ctx->done) {
