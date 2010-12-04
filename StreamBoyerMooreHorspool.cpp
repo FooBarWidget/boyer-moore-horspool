@@ -285,11 +285,6 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		 *   optimized loop.
 		 * or until
 		 *   the character to look at lies outside the haystack.
-		 *   Boyer-Moore-Horspool cannot run until we have more data.
-		 *   Update the lookbehind buffer in preparation for the next
-		 *   round and run a different algorithm to match as much
-		 *   of the remaining data as possible (similar to
-		 *   the one at the end of this function).
 		 */
 		while (pos < 0 && pos <= ssize_t(len) - ssize_t(needle_len)) {
 			 unsigned char ch = sbmh_lookup_char(ctx, data,
