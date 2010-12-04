@@ -18,6 +18,35 @@ getTime() {
 	return (unsigned long long) tv.tv_sec * 1000 + (unsigned long long) tv.tv_usec / 1000;
 }
 
+const char *
+memmem2(const char *haystack, size_t haystack_len, const char *needle, size_t needle_len) {
+	if (needle_len == 0) {
+		return haystack;
+	}
+	
+	const char *last_possible = haystack + haystack_len - needle_len;
+	do {
+		const char *result = (const char *) memchr(haystack, needle[0], haystack_len);
+		if (result != NULL) {
+			if (result > last_possible) {
+				return NULL;
+			} else if (memcmp(result, needle, needle_len) == 0) {
+				return result;
+			} else {
+				ssize_t new_len = ssize_t(haystack_len) - (result - haystack) - 1;
+				if (new_len <= 0) {
+					return NULL;
+				} else {
+					haystack = result + 1;
+					haystack_len = new_len;
+				}
+			}
+		} else {
+			return NULL;
+		}
+	} while (true);
+}
+
 int
 main(int argc, char *argv[]) {
 	const char *filename;
@@ -28,7 +57,7 @@ main(int argc, char *argv[]) {
 	if (argc >= 2) {
 		filename = argv[1];
 	} else {
-		filename = "binary.dat";
+		filename = "benchmark_input/binary.dat";
 	}
 	if (argc >= 3) {
 		needle = (const unsigned char *) argv[2];
@@ -44,6 +73,10 @@ main(int argc, char *argv[]) {
 	
 	string data;
 	FILE *f = fopen(filename, "rb");
+	if (f == NULL) {
+		printf("Cannot open %s\n", filename);
+		return 1;
+	}
 	while (!feof(f)) {
 		char buf[1024 * 8];
 		size_t ret = fread(buf, 1, sizeof(buf), f);
@@ -94,6 +127,32 @@ main(int argc, char *argv[]) {
 	}
 	t2 = getTime();
 	printf("Turbo Boyer-Moore   : found at position %d in %d msec\n", int(found), int(t2 - t1));
+	
+	if (data.find('\0') == string::npos) {
+		t1 = getTime();
+		for (i = 0; i < iterations; i++) {
+			const char *result = strstr(data.c_str(), (const char *) needle);
+			if (result == NULL) {
+				found = data.size();
+			} else {
+				found = result - data.c_str();
+			}
+		}
+		t2 = getTime();
+		printf("strstr              : found at position %d in %d msec\n", int(found), int(t2 - t1));
+	}
+	
+	t1 = getTime();
+	for (i = 0; i < iterations; i++) {
+		const char *result = memmem2(data.c_str(), data.size(), (const char *) needle, needle_len);
+		if (result == NULL) {
+			found = data.size();
+		} else {
+			found = result - data.c_str();
+		}
+	}
+	t2 = getTime();
+	printf("memmem2             : found at position %d in %d msec\n", int(found), int(t2 - t1));
 	
 	return 0;
 }
