@@ -3,7 +3,7 @@
 #include <alloca.h>
 
 #include "tut.h"
-#include "StreamBoyerMooreHorspool.cpp"
+#include "StreamBoyerMooreHorspool.h"
 
 using namespace std;
 

@@ -8,7 +8,7 @@ file 'HorspoolTest.o' => ['HorspoolTest.cpp', 'Horspool.cpp'] do
 	sh "g++ #{CXXFLAGS} -c HorspoolTest.cpp -o HorspoolTest.o"
 end
 
-file 'StreamTest.o' => ['StreamTest.cpp', 'StreamBoyerMooreHorspool.cpp'] do
+file 'StreamTest.o' => ['StreamTest.cpp', 'StreamBoyerMooreHorspool.h'] do
 	sh "g++ #{CXXFLAGS} -c StreamTest.cpp -o StreamTest.o"
 end
 
@@ -22,7 +22,7 @@ file 'test' => ['HorspoolTest.o', 'StreamTest.o', 'TestMain.o'] do
 end
 
 desc "Build benchmark runner"
-file 'benchmark' => ['benchmark.cpp', 'Horspool.cpp', 'BoyerMooreAndTurbo.cpp', 'StreamBoyerMooreHorspool.cpp'] do
+file 'benchmark' => ['benchmark.cpp', 'Horspool.cpp', 'BoyerMooreAndTurbo.cpp', 'StreamBoyerMooreHorspool.h'] do
 	sh "g++ #{CXXFLAGS} #{OPTIMIZE_FLAGS} benchmark.cpp -o benchmark"
 end
 

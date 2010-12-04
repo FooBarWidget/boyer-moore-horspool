@@ -13,7 +13,7 @@ HorspoolTest.cpp is the unit test file.
 ### BoyerMooreAndTurbo.cpp
 Implements Boyer-Moore and Turbo Boyer-Moore. No special test files, but they're used in the benchmark program which serves as a basic sanity test.
 
-### StreamBoyerMooreHorspool.cpp
+### StreamBoyerMooreHorspool.h
 A special Boyer-Moore-Horspool implementation that supports "streaming" input. Instead of supplying the entire haystack at once, you can supply the haystack piece-by-piece. This makes it especially suitable for parsing data that you may receive over the network. This implementation also contains various memory and CPU optimizations, allowing it to be slightly faster and to use less memory than Horspool.cpp. See the file for detailed documentation.
 
 Unit tests are in StreamTest.cpp.

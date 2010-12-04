@@ -7,7 +7,7 @@
 
 #include "Horspool.cpp"
 #include "BoyerMooreAndTurbo.cpp"
-#include "StreamBoyerMooreHorspool.cpp"
+#include "StreamBoyerMooreHorspool.h"
 
 using namespace std;
 
