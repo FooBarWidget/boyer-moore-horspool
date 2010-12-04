@@ -98,7 +98,7 @@ namespace tut {
 	
 	
 	TEST_METHOD(10) {
-		set_test_name("It returns the position a which the needle is first found (1 character needle)");
+		set_test_name("It returns the position in which the needle is first found (1 character needle)");
 		
 		ensure_equals(find("1", "1234567891"), 0);
 		ensure_equals(find("2", "1234567892"), 1);
@@ -107,7 +107,7 @@ namespace tut {
 	}
 	
 	TEST_METHOD(11) {
-		set_test_name("It returns the position a which the needle is first found (2 different character needle)");
+		set_test_name("It returns the position in which the needle is first found (2 different character needle)");
 		
 		ensure_equals(find("ab", "ab3456789ab"), 0);
 		ensure_equals(find("ab", "1ab456789ab"), 1);
@@ -130,7 +130,7 @@ namespace tut {
 	}
 	
 	TEST_METHOD(12) {
-		set_test_name("It returns the position a which the needle is found (2 identifical character needle)");
+		set_test_name("It returns the position in which the needle is found (2 identifical character needle)");
 		
 		ensure_equals(find("\n\n", "\n\nhello world\n\n"), 0);
 		ensure_equals(find("\n\n", "h\n\nello world"), 1);
@@ -213,7 +213,7 @@ namespace tut {
 	
 	
 	TEST_METHOD(30) {
-		set_test_name("It returns the position a which the needle is first found (1 character needle)");
+		set_test_name("It returns the position in which the needle is first found (1 character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("1", "1234567891"), 0);
 		ensure_equals(feed_in_chunks_and_find("2", "1234567892"), 1);
@@ -222,7 +222,7 @@ namespace tut {
 	}
 	
 	TEST_METHOD(31) {
-		set_test_name("It returns the position a which the needle is first found (2 different character needle)");
+		set_test_name("It returns the position in which the needle is first found (2 different character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "ab3456789ab"), 0);
 		ensure_equals(feed_in_chunks_and_find("ab", "1ab456789ab"), 1);
@@ -245,7 +245,7 @@ namespace tut {
 	}
 	
 	TEST_METHOD(32) {
-		set_test_name("It returns the position a which the needle is found (2 identifical character needle)");
+		set_test_name("It returns the position in which the needle is found (2 identifical character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "\n\nhello world\n\n"), 0);
 		ensure_equals(feed_in_chunks_and_find("\n\n", "h\n\nello world"), 1);
@@ -329,7 +329,7 @@ namespace tut {
 	
 	
 	TEST_METHOD(50) {
-		set_test_name("It returns the position a which the needle is first found (1 character needle)");
+		set_test_name("It returns the position in which the needle is first found (1 character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("1", "1234567891", 3), 0);
 		ensure_equals(feed_in_chunks_and_find("2", "1234567892", 3), 1);
@@ -338,7 +338,7 @@ namespace tut {
 	}
 	
 	TEST_METHOD(51) {
-		set_test_name("It returns the position a which the needle is first found (2 different character needle)");
+		set_test_name("It returns the position in which the needle is first found (2 different character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "ab3456789ab", 3), 0);
 		ensure_equals(feed_in_chunks_and_find("ab", "1ab456789ab", 3), 1);
@@ -361,7 +361,7 @@ namespace tut {
 	}
 	
 	TEST_METHOD(52) {
-		set_test_name("It returns the position a which the needle is found (2 identifical character needle)");
+		set_test_name("It returns the position in which the needle is found (2 identifical character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "\n\nhello world\n\n", 3), 0);
 		ensure_equals(feed_in_chunks_and_find("\n\n", "h\n\nello world", 3), 1);
