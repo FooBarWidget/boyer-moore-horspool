@@ -295,6 +295,9 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		}
 	}
 	
+	assert(pos >= 0);
+	assert(ctx->lookbehind_size == 0);
+	
 	/* Lookbehind buffer is now empty. Perform Boyer-Moore-Horspool
 	 * search with optimized character lookup code that only considers
 	 * the current round's haystack data.
@@ -316,11 +319,24 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 	}
 	
 	/* There was no match. If there's trailing haystack data that we cannot
-	 * match yet, add that to the lookbehind buffer.
+	 * match yet using the Boyer-Moore-Horspool algorithm (because the trailing
+	 * data is less than the needle size) then match using a modified
+	 * algorithm that starts matching from the beginning instead of the end.
+	 * Whatever trailing data is left after running this algorithm is added to
+	 * the lookbehind buffer.
 	 */
 	if (size_t(pos) < len) {
-		memcpy(ctx->lookbehind, data + pos, len - pos);
-		ctx->lookbehind_size = len - pos;
+		while (size_t(pos) < len
+		    && (
+		          data[pos] != needle[0]
+		       || memcmp(data + pos, needle, len - pos) != 0
+		)) {
+			pos++;
+		}
+		if (size_t(pos) < len) {
+			memcpy(ctx->lookbehind, data + pos, len - pos);
+			ctx->lookbehind_size = len - pos;
+		}
 	}
 	
 	ctx->analyzed += len;
