@@ -2,3 +2,7 @@
 *.dSYM
 /test
 /benchmark
+benchmark_input/alice-large.html
+benchmark_input/alice-small.html
+benchmark_input/newlines.txt
+benchmark_input/binary.dat
