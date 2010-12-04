@@ -19,6 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef _STREAM_BOYER_MOORE_HORSPOOL_
+#define _STREAM_BOYER_MOORE_HORSPOOL_
 
 /*
  * Boyer-Moore-Horspool string search algorithm implementation with streaming support.
@@ -199,13 +201,13 @@ struct StreamBMH {
 #endif
 
 
-void
+inline void
 sbmh_reset(struct StreamBMH *restrict ctx) {
 	ctx->found = false;
 	ctx->lookbehind_size = 0;
 }
 
-void
+inline void
 sbmh_init(struct StreamBMH *restrict ctx, const unsigned char *restrict needle,
 	sbmh_size_t needle_len)
 {
@@ -231,7 +233,7 @@ sbmh_init(struct StreamBMH *restrict ctx, const unsigned char *restrict needle,
 	}
 }
 
-static char
+inline char
 sbmh_lookup_char(const struct StreamBMH *restrict ctx,
 	const unsigned char *restrict data, ssize_t pos)
 {
@@ -242,7 +244,7 @@ sbmh_lookup_char(const struct StreamBMH *restrict ctx,
 	}
 }
 
-static bool
+inline bool
 sbmh_memcmp(const struct StreamBMH *restrict ctx,
 	const unsigned char *restrict needle, const unsigned char *restrict data,
 	ssize_t pos, sbmh_size_t len)
@@ -262,7 +264,7 @@ sbmh_memcmp(const struct StreamBMH *restrict ctx,
 	return true;
 }
 
-size_t
+inline size_t
 sbmh_feed(struct StreamBMH *restrict ctx,
 	const unsigned char *restrict needle, sbmh_size_t needle_len,
 	const unsigned char *restrict data, size_t len)
@@ -435,3 +437,5 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 	
 	return len;
 }
+
+#endif /* _STREAM_BOYER_MOORE_HORSPOOL_ */
