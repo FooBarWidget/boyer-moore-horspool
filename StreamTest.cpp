@@ -190,44 +190,105 @@ namespace tut {
 		set_test_name("It returns the position in which the needle is first found (1 character needle)");
 		
 		ensure_equals(find("1", "1234567891"), 0);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("2", "1234567892"), 1);
+		ensure_equals(unmatched_data, "1");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("8", "1234567898"), 7);
+		ensure_equals(unmatched_data, "1234567");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("9", "1234567899"), 8);
+		ensure_equals(unmatched_data, "12345678");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(11) {
 		set_test_name("It returns the position in which the needle is first found (2 different character needle)");
 		
 		ensure_equals(find("ab", "ab3456789ab"), 0);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
 		ensure_equals(find("ab", "1ab456789ab"), 1);
+		ensure_equals(unmatched_data, "1");
+		ensure_equals(lookbehind, "");
 		ensure_equals(find("ab", "12ab56789ab"), 2);
+		ensure_equals(unmatched_data, "12");
+		ensure_equals(lookbehind, "");
 		ensure_equals(find("ab", "123ab6789ab"), 3);
+		ensure_equals(unmatched_data, "123");
+		ensure_equals(lookbehind, "");
 		
 		ensure_equals(find("ab", "bbab3456789ab"), 2);
+		ensure_equals(unmatched_data, "bb");
+		ensure_equals(lookbehind, "");
 		ensure_equals(find("ab", "bb1ab456789ab"), 3);
+		ensure_equals(unmatched_data, "bb1");
+		ensure_equals(lookbehind, "");
 		ensure_equals(find("ab", "bb12ab56789ab"), 4);
+		ensure_equals(unmatched_data, "bb12");
+		ensure_equals(lookbehind, "");
 		ensure_equals(find("ab", "bb123ab6789ab"), 5);
+		ensure_equals(unmatched_data, "bb123");
+		ensure_equals(lookbehind, "");
 		
 		ensure_equals(find("ab", "baab3456789ab"), 2);
+		ensure_equals(unmatched_data, "ba");
+		ensure_equals(lookbehind, "");
 		ensure_equals(find("ab", "ba1ab456789ab"), 3);
+		ensure_equals(unmatched_data, "ba1");
+		ensure_equals(lookbehind, "");
 		ensure_equals(find("ab", "ba12ab56789ab"), 4);
+		ensure_equals(unmatched_data, "ba12");
+		ensure_equals(lookbehind, "");
 		ensure_equals(find("ab", "ba123ab6789ab"), 5);
+		ensure_equals(unmatched_data, "ba123");
+		ensure_equals(lookbehind, "");
 		
 		ensure_equals(find("ab", "003456789ab"), 9);
+		ensure_equals(unmatched_data, "003456789");
+		ensure_equals(lookbehind, "");
 		ensure_equals(find("ab", "100456789aabab"), 10);
+		ensure_equals(unmatched_data, "100456789a");
+		ensure_equals(lookbehind, "");
 		ensure_equals(find("ab", "120056789abbab"), 9);
+		ensure_equals(unmatched_data, "120056789");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(12) {
 		set_test_name("It returns the position in which the needle is found (2 identifical character needle)");
 		
 		ensure_equals(find("\n\n", "\n\nhello world\n\n"), 0);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("\n\n", "h\n\nello world"), 1);
+		ensure_equals(unmatched_data, "h");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("\n\n", "he\n\nllo world"), 2);
+		ensure_equals(unmatched_data, "he");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("\n\n", "hel\n\nllo world"), 3);
+		ensure_equals(unmatched_data, "hel");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("\n\n", "hello\n\nworld\n\n"), 5);
+		ensure_equals(unmatched_data, "hello");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("\n\n", "\nhello\n\nworld\n\n"), 6);
+		ensure_equals(unmatched_data, "\nhello");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("\n\n", "h\nello\n\nworld\n\n"), 6);
+		ensure_equals(unmatched_data, "h\nello");
+		ensure_equals(lookbehind, "");
 	}
 	
 	
@@ -245,6 +306,20 @@ namespace tut {
 			"more binary data\r\n"
 			"--boundary\r\n"),
 			57);
+		
+		ensure_equals(find(
+			"I have control\n",
+			"[sbmh] inconclusive\n"
+			"HorspoolTest: .........\n"
+			"I hive control\n"
+			"I have control\n"
+			"x"),
+			59);
+		ensure_equals(unmatched_data,
+			"[sbmh] inconclusive\n"
+			"HorspoolTest: .........\n"
+			"I hive control\n");
+		ensure_equals(lookbehind, "");
 	}
 	
 	
@@ -373,44 +448,105 @@ namespace tut {
 		set_test_name("It returns the position in which the needle is first found (1 character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("1", "1234567891"), 0);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("2", "1234567892"), 1);
+		ensure_equals(unmatched_data, "1");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("8", "1234567898"), 7);
+		ensure_equals(unmatched_data, "1234567");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("9", "1234567899"), 8);
+		ensure_equals(unmatched_data, "12345678");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(31) {
 		set_test_name("It returns the position in which the needle is first found (2 different character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "ab3456789ab"), 0);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "1ab456789ab"), 1);
+		ensure_equals(unmatched_data, "1");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "12ab56789ab"), 2);
+		ensure_equals(unmatched_data, "12");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "123ab6789ab"), 3);
+		ensure_equals(unmatched_data, "123");
+		ensure_equals(lookbehind, "");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "bbab3456789ab"), 2);
+		ensure_equals(unmatched_data, "bb");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "bb1ab456789ab"), 3);
+		ensure_equals(unmatched_data, "bb1");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "bb12ab56789ab"), 4);
+		ensure_equals(unmatched_data, "bb12");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "bb123ab6789ab"), 5);
+		ensure_equals(unmatched_data, "bb123");
+		ensure_equals(lookbehind, "");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "baab3456789ab"), 2);
+		ensure_equals(unmatched_data, "ba");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "ba1ab456789ab"), 3);
+		ensure_equals(unmatched_data, "ba1");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "ba12ab56789ab"), 4);
+		ensure_equals(unmatched_data, "ba12");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "ba123ab6789ab"), 5);
+		ensure_equals(unmatched_data, "ba123");
+		ensure_equals(lookbehind, "");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "003456789ab"), 9);
+		ensure_equals(unmatched_data, "003456789");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "100456789aabab"), 10);
+		ensure_equals(unmatched_data, "100456789a");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "120056789abbab"), 9);
+		ensure_equals(unmatched_data, "120056789");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(32) {
 		set_test_name("It returns the position in which the needle is found (2 identifical character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "\n\nhello world\n\n"), 0);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "h\n\nello world"), 1);
+		ensure_equals(unmatched_data, "h");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "he\n\nllo world"), 2);
+		ensure_equals(unmatched_data, "he");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "hel\n\nllo world"), 3);
+		ensure_equals(unmatched_data, "hel");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "hello\n\nworld\n\n"), 5);
+		ensure_equals(unmatched_data, "hello");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "\nhello\n\nworld\n\n"), 6);
+		ensure_equals(unmatched_data, "\nhello");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "h\nello\n\nworld\n\n"), 6);
+		ensure_equals(unmatched_data, "h\nello");
+		ensure_equals(lookbehind, "");
 	}
 	
 	
@@ -429,6 +565,20 @@ namespace tut {
 			"more binary data\r\n"
 			"--boundary\r\n"),
 			57);
+		
+		ensure_equals(feed_in_chunks_and_find(
+			"I have control\n",
+			"[sbmh] inconclusive\n"
+			"HorspoolTest: .........\n"
+			"I hive control\n"
+			"I have control\n"
+			"x"),
+			59);
+		ensure_equals(unmatched_data,
+			"[sbmh] inconclusive\n"
+			"HorspoolTest: .........\n"
+			"I hive control\n");
+		ensure_equals(lookbehind, "");
 	}
 	
 	
@@ -558,45 +708,109 @@ namespace tut {
 		set_test_name("It returns the position in which the needle is first found (1 character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("1", "1234567891", 3), 0);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("2", "1234567892", 3), 1);
+		ensure_equals(unmatched_data, "1");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("8", "1234567898", 3), 7);
+		ensure_equals(unmatched_data, "1234567");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("9", "1234567899", 3), 8);
+		ensure_equals(unmatched_data, "12345678");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(51) {
 		set_test_name("It returns the position in which the needle is first found (2 different character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "ab3456789ab", 3), 0);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "1ab456789ab", 3), 1);
+		ensure_equals(unmatched_data, "1");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "12ab56789ab", 3), 2);
+		ensure_equals(unmatched_data, "12");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "123ab6789ab", 3), 3);
+		ensure_equals(unmatched_data, "123");
+		ensure_equals(lookbehind, "");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "bbab3456789ab", 3), 2);
+		ensure_equals(unmatched_data, "bb");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "bb1ab456789ab", 3), 3);
+		ensure_equals(unmatched_data, "bb1");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "bb12ab56789ab", 3), 4);
+		ensure_equals(unmatched_data, "bb12");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "bb123ab6789ab", 3), 5);
+		ensure_equals(unmatched_data, "bb123");
+		ensure_equals(lookbehind, "");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "baab3456789ab", 3), 2);
+		ensure_equals(unmatched_data, "ba");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "ba1ab456789ab", 3), 3);
+		ensure_equals(unmatched_data, "ba1");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "ba12ab56789ab", 3), 4);
+		ensure_equals(unmatched_data, "ba12");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "ba123ab6789ab", 3), 5);
+		ensure_equals(unmatched_data, "ba123");
+		ensure_equals(lookbehind, "");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "003456789ab", 3), 9);
+		ensure_equals(unmatched_data, "003456789");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "100456789aabab", 3), 10);
+		ensure_equals(unmatched_data, "100456789a");
+		ensure_equals(lookbehind, "");
 		ensure_equals(feed_in_chunks_and_find("ab", "120056789abbab", 3), 9);
+		ensure_equals(unmatched_data, "120056789");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(52) {
 		set_test_name("It returns the position in which the needle is found (2 identifical character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "\n\nhello world\n\n", 3), 0);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "h\n\nello world", 3), 1);
+		ensure_equals(unmatched_data, "h");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "he\n\nllo world", 3), 2);
+		ensure_equals(unmatched_data, "he");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "hel\n\nllo world", 3), 3);
+		ensure_equals(unmatched_data, "hel");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "hell\n\nlo world", 3), 4);
+		ensure_equals(unmatched_data, "hell");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "hello\n\nworld\n\n", 3), 5);
+		ensure_equals(unmatched_data, "hello");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "\nhello\n\nworld\n\n", 3), 6);
+		ensure_equals(unmatched_data, "\nhello");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "h\nello\n\nworld\n\n", 3), 6);
+		ensure_equals(unmatched_data, "h\nello");
+		ensure_equals(lookbehind, "");
 	}
 	
 	
@@ -615,5 +829,19 @@ namespace tut {
 			"more binary data\r\n"
 			"--boundary\r\n", 3),
 			57);
+		
+		ensure_equals(feed_in_chunks_and_find(
+			"I have control\n",
+			"[sbmh] inconclusive\n"
+			"HorspoolTest: .........\n"
+			"I hive control\n"
+			"I have control\n"
+			"x", 3),
+			59);
+		ensure_equals(unmatched_data,
+			"[sbmh] inconclusive\n"
+			"HorspoolTest: .........\n"
+			"I hive control\n");
+		ensure_equals(lookbehind, "");
 	}
 }
