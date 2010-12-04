@@ -157,16 +157,32 @@ namespace tut {
 		set_test_name("Searching in an empty string always fails.");
 		
 		ensure_equals(find("1", ""), -1);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("abc", ""), -1);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("hello world", ""), -1);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(5) {
 		set_test_name("Searching for a needle that's larger than the haystack always fails");
 		
 		ensure_equals(find("ab", "a"), -1);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "a");
+		
 		ensure_equals(find("hello", "hm"), -1);
+		ensure_equals(unmatched_data, "hm");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("hello my world!", "this is small"), -1);
+		ensure_equals(unmatched_data, "this is small");
+		ensure_equals(lookbehind, "");
 	}
 	
 	
@@ -325,18 +341,33 @@ namespace tut {
 		set_test_name("Searching in an empty string always fails.");
 		
 		ensure_equals(feed_in_chunks_and_find("1", ""), -1);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("abc", ""), -1);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("hello world", ""), -1);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(25) {
 		set_test_name("Searching for a needle that's larger than the haystack always fails");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "a"), -1);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "a");
+		
 		ensure_equals(feed_in_chunks_and_find("hello", "hm"), -1);
+		ensure_equals(unmatched_data, "hm");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("hello my world!", "this is small"), -1);
+		ensure_equals(unmatched_data, "this is small");
+		ensure_equals(lookbehind, "");
 	}
-	
 	
 	TEST_METHOD(30) {
 		set_test_name("It returns the position in which the needle is first found (1 character needle)");
@@ -494,16 +525,32 @@ namespace tut {
 		set_test_name("Searching in an empty string always fails.");
 		
 		ensure_equals(feed_in_chunks_and_find("1", "", 3), -1);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("abc", "", 3), -1);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("hello world", "", 3), -1);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(45) {
 		set_test_name("Searching for a needle that's larger than the haystack always fails");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "a", 3), -1);
+		ensure_equals(unmatched_data, "");
+		ensure_equals(lookbehind, "a");
+		
 		ensure_equals(feed_in_chunks_and_find("hello", "hm", 3), -1);
+		ensure_equals(unmatched_data, "hm");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("hello my world!", "this is small", 3), -1);
+		ensure_equals(unmatched_data, "this is small");
+		ensure_equals(lookbehind, "");
 	}
 	
 	

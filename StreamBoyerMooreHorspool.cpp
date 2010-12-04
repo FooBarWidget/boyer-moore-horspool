@@ -170,6 +170,19 @@ struct StreamBMH {
 
 #define SBMH_SIZE(needle_len) (sizeof(struct StreamBMH) + (needle_len) - 1)
 
+#if 0
+	#include <string>
+	#include <cstdio>
+	
+	#define SBMH_DEBUG(format) printf(format)
+	#define SBMH_DEBUG1(format, arg1) printf(format, arg1)
+	#define SBMH_DEBUG2(format, arg1, arg2) printf(format, arg1, arg2)
+#else
+	#define SBMH_DEBUG(format) do { /* nothing */ } while (false)
+	#define SBMH_DEBUG1(format, arg1) do { /* nothing */ } while (false)
+	#define SBMH_DEBUG2(format, arg1, arg2) do { /* nothing */ } while (false)
+#endif
+
 
 void
 sbmh_reset(struct StreamBMH *restrict ctx) {
@@ -240,6 +253,8 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 	const unsigned char *restrict needle, sbmh_size_t needle_len,
 	const unsigned char *restrict data, size_t len)
 {
+	SBMH_DEBUG1("\n[sbmh] feeding: (%s)\n", std::string((const char *) data, len).c_str());
+	
 	if (ctx->found) {
 		return 0;
 	}
@@ -254,6 +269,10 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 	const sbmh_size_t *occ = ctx->occ;
 	
 	if (pos < 0) {
+		SBMH_DEBUG2("[sbmh] considering lookbehind: (%s)(%s)\n",
+			std::string((const char *) ctx->lookbehind, ctx->lookbehind_size).c_str(),
+			std::string((const char *) data, len).c_str());
+		
 		/* Lookbehind buffer is not empty. Perform Boyer-Moore-Horspool
 		 * search with character lookup code that considers both the
 		 * lookbehind buffer and the current round's haystack data.
@@ -266,8 +285,11 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		 *   optimized loop.
 		 * or until
 		 *   the character to look at lies outside the haystack.
-		 *   In this case we update the lookbehind buffer in
-		 *   preparation for the next round.
+		 *   Boyer-Moore-Horspool cannot run until we have more data.
+		 *   Update the lookbehind buffer in preparation for the next
+		 *   round and run a different algorithm to match as much
+		 *   of the remaining data as possible (similar to
+		 *   the one at the end of this function).
 		 */
 		while (pos < 0 && pos <= ssize_t(len) - ssize_t(needle_len)) {
 			 unsigned char ch = sbmh_lookup_char(ctx, data,
@@ -282,6 +304,8 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 					ctx->callback(ctx, ctx->lookbehind,
 						ctx->lookbehind_size + pos);
 				}
+				SBMH_DEBUG1("[sbmh] found using lookbehind; end = %d\n",
+					int(pos + needle_len));
 				return pos + needle_len;
 			} else {
 				pos += ctx->occ[ch];
@@ -290,7 +314,26 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		
 		// No match.
 		
+		if (pos < 0) {
+			/* There's too few data for Boyer-Moore-Horspool to run,
+			 * so let's use a different algorithm to skip as much as
+			 * we can.
+			 * Forward pos until
+			 *   the trailing part of lookbehind + data
+			 *   looks like the beginning of the needle
+			 * or until
+			 *   pos == 0
+			 */
+			SBMH_DEBUG1("[sbmh] inconclusive; pos = %d\n", (int) pos);
+			while (pos < 0 && !sbmh_memcmp(ctx, needle, data, pos, len - pos)) {
+				pos++;
+			}
+			SBMH_DEBUG1("[sbmh] managed to skip to pos = %d\n", (int) pos);
+		}
+		
 		if (pos >= 0) {
+			/* Discard lookbehind buffer. */
+			SBMH_DEBUG("[sbmh] no match; discarding lookbehind\n");
 			if (ctx->callback != NULL) {
 				ctx->callback(ctx, ctx->lookbehind, ctx->lookbehind_size);
 			}
@@ -317,6 +360,9 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 				data, len);
 			ctx->lookbehind_size += len;
 			
+			SBMH_DEBUG1("[sbmh] update lookbehind -> (%s)\n",
+				std::string((const char *) ctx->lookbehind, ctx->lookbehind_size).c_str());
+			
 			ctx->analyzed += len;
 			return len;
 		}
@@ -324,6 +370,8 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 	
 	assert(pos >= 0);
 	assert(ctx->lookbehind_size == 0);
+	
+	SBMH_DEBUG1("[sbmh] starting from pos = %d\n", (int) pos);
 	
 	/* Lookbehind buffer is now empty. Perform Boyer-Moore-Horspool
 	 * search with optimized character lookup code that only considers
@@ -337,6 +385,7 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		     && unlikely( *(data + pos) == needle[0] )
 		     && unlikely( memcmp(needle, data + pos, needle_len - 1) == 0 )
 		)) {
+			SBMH_DEBUG1("[sbmh] found at position %d\n", (int) pos);
 			ctx->found = true;
 			ctx->analyzed += pos + needle_len;
 			if (pos > 0 && ctx->callback != NULL) {
@@ -355,6 +404,7 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 	 * Whatever trailing data is left after running this algorithm is added to
 	 * the lookbehind buffer.
 	 */
+	SBMH_DEBUG("[sbmh] no match\n");
 	if (size_t(pos) < len) {
 		while (size_t(pos) < len
 		    && (
@@ -366,6 +416,10 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		if (size_t(pos) < len) {
 			memcpy(ctx->lookbehind, data + pos, len - pos);
 			ctx->lookbehind_size = len - pos;
+			SBMH_DEBUG2("[sbmh] adding %d trailing bytes to lookbehind -> (%s)\n",
+				int(len - pos),
+				std::string((const char *) ctx->lookbehind,
+					ctx->lookbehind_size).c_str());
 		}
 	}
 	
