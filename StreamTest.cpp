@@ -133,6 +133,9 @@ namespace tut {
 		set_test_name("It returns the position a which the needle is found (2 identifical character needle)");
 		
 		ensure_equals(find("\n\n", "\n\nhello world\n\n"), 0);
+		ensure_equals(find("\n\n", "h\n\nello world"), 1);
+		ensure_equals(find("\n\n", "he\n\nllo world"), 2);
+		ensure_equals(find("\n\n", "hel\n\nllo world"), 3);
 		ensure_equals(find("\n\n", "hello\n\nworld\n\n"), 5);
 		ensure_equals(find("\n\n", "\nhello\n\nworld\n\n"), 6);
 		ensure_equals(find("\n\n", "h\nello\n\nworld\n\n"), 6);
@@ -245,6 +248,9 @@ namespace tut {
 		set_test_name("It returns the position a which the needle is found (2 identifical character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "\n\nhello world\n\n"), 0);
+		ensure_equals(feed_in_chunks_and_find("\n\n", "h\n\nello world"), 1);
+		ensure_equals(feed_in_chunks_and_find("\n\n", "he\n\nllo world"), 2);
+		ensure_equals(feed_in_chunks_and_find("\n\n", "hel\n\nllo world"), 3);
 		ensure_equals(feed_in_chunks_and_find("\n\n", "hello\n\nworld\n\n"), 5);
 		ensure_equals(feed_in_chunks_and_find("\n\n", "\nhello\n\nworld\n\n"), 6);
 		ensure_equals(feed_in_chunks_and_find("\n\n", "h\nello\n\nworld\n\n"), 6);
@@ -358,6 +364,10 @@ namespace tut {
 		set_test_name("It returns the position a which the needle is found (2 identifical character needle)");
 		
 		ensure_equals(feed_in_chunks_and_find("\n\n", "\n\nhello world\n\n", 3), 0);
+		ensure_equals(feed_in_chunks_and_find("\n\n", "h\n\nello world", 3), 1);
+		ensure_equals(feed_in_chunks_and_find("\n\n", "he\n\nllo world", 3), 2);
+		ensure_equals(feed_in_chunks_and_find("\n\n", "hel\n\nllo world", 3), 3);
+		ensure_equals(feed_in_chunks_and_find("\n\n", "hell\n\nlo world", 3), 4);
 		ensure_equals(feed_in_chunks_and_find("\n\n", "hello\n\nworld\n\n", 3), 5);
 		ensure_equals(feed_in_chunks_and_find("\n\n", "\nhello\n\nworld\n\n", 3), 6);
 		ensure_equals(feed_in_chunks_and_find("\n\n", "h\nello\n\nworld\n\n", 3), 6);
