@@ -64,6 +64,8 @@ namespace tut {
 		ensure_equals(find("ab", "1b3456789"), -1);
 		ensure_equals(find("ab", "123b56789"), -1);
 		ensure_equals(find("ab", "12a456789"), -1);
+		ensure_equals(find("ab", "12a45678a"), -1);
+		ensure_equals(find("ab", "12a45678aa"), -1);
 	}
 	
 	TEST_METHOD(3) {
@@ -74,6 +76,8 @@ namespace tut {
 		ensure_equals(find("aa", "a23456789"), -1);
 		ensure_equals(find("aa", "1a3456789"), -1);
 		ensure_equals(find("aa", "12a4a6789"), -1);
+		ensure_equals(find("aa", "12a4a678a"), -1);
+		ensure_equals(find("aa", "12a4a678ba"), -1);
 	}
 	
 	TEST_METHOD(4) {
@@ -119,6 +123,10 @@ namespace tut {
 		ensure_equals(find("ab", "ba1ab456789ab"), 3);
 		ensure_equals(find("ab", "ba12ab56789ab"), 4);
 		ensure_equals(find("ab", "ba123ab6789ab"), 5);
+		
+		ensure_equals(find("ab", "003456789ab"), 9);
+		ensure_equals(find("ab", "100456789aabab"), 10);
+		ensure_equals(find("ab", "120056789abbab"), 9);
 	}
 	
 	TEST_METHOD(12) {
@@ -168,6 +176,8 @@ namespace tut {
 		ensure_equals(feed_in_chunks_and_find("ab", "1b3456789"), -1);
 		ensure_equals(feed_in_chunks_and_find("ab", "123b56789"), -1);
 		ensure_equals(feed_in_chunks_and_find("ab", "12a456789"), -1);
+		ensure_equals(feed_in_chunks_and_find("ab", "12a45678a"), -1);
+		ensure_equals(feed_in_chunks_and_find("ab", "12a45678aa"), -1);
 	}
 	
 	TEST_METHOD(23) {
@@ -178,6 +188,8 @@ namespace tut {
 		ensure_equals(feed_in_chunks_and_find("aa", "a23456789"), -1);
 		ensure_equals(feed_in_chunks_and_find("aa", "1a3456789"), -1);
 		ensure_equals(feed_in_chunks_and_find("aa", "12a4a6789"), -1);
+		ensure_equals(feed_in_chunks_and_find("ab", "12a45678a"), -1);
+		ensure_equals(feed_in_chunks_and_find("ab", "12a45678aa"), -1);
 	}
 	
 	TEST_METHOD(24) {
@@ -223,6 +235,10 @@ namespace tut {
 		ensure_equals(feed_in_chunks_and_find("ab", "ba1ab456789ab"), 3);
 		ensure_equals(feed_in_chunks_and_find("ab", "ba12ab56789ab"), 4);
 		ensure_equals(feed_in_chunks_and_find("ab", "ba123ab6789ab"), 5);
+		
+		ensure_equals(feed_in_chunks_and_find("ab", "003456789ab"), 9);
+		ensure_equals(feed_in_chunks_and_find("ab", "100456789aabab"), 10);
+		ensure_equals(feed_in_chunks_and_find("ab", "120056789abbab"), 9);
 	}
 	
 	TEST_METHOD(32) {
@@ -273,6 +289,8 @@ namespace tut {
 		ensure_equals(feed_in_chunks_and_find("ab", "1b3456789", 3), -1);
 		ensure_equals(feed_in_chunks_and_find("ab", "123b56789", 3), -1);
 		ensure_equals(feed_in_chunks_and_find("ab", "12a456789", 3), -1);
+		ensure_equals(feed_in_chunks_and_find("ab", "12a45678a", 3), -1);
+		ensure_equals(feed_in_chunks_and_find("ab", "12a45678aa", 3), -1);
 	}
 	
 	TEST_METHOD(43) {
@@ -283,6 +301,8 @@ namespace tut {
 		ensure_equals(feed_in_chunks_and_find("aa", "a23456789", 3), -1);
 		ensure_equals(feed_in_chunks_and_find("aa", "1a3456789", 3), -1);
 		ensure_equals(feed_in_chunks_and_find("aa", "12a4a6789", 3), -1);
+		ensure_equals(feed_in_chunks_and_find("aa", "12a4a678a", 3), -1);
+		ensure_equals(feed_in_chunks_and_find("aa", "12a4a678ba", 3), -1);
 	}
 	
 	TEST_METHOD(44) {
@@ -328,6 +348,10 @@ namespace tut {
 		ensure_equals(feed_in_chunks_and_find("ab", "ba1ab456789ab", 3), 3);
 		ensure_equals(feed_in_chunks_and_find("ab", "ba12ab56789ab", 3), 4);
 		ensure_equals(feed_in_chunks_and_find("ab", "ba123ab6789ab", 3), 5);
+		
+		ensure_equals(feed_in_chunks_and_find("ab", "003456789ab", 3), 9);
+		ensure_equals(feed_in_chunks_and_find("ab", "100456789aabab", 3), 10);
+		ensure_equals(feed_in_chunks_and_find("ab", "120056789abbab", 3), 9);
 	}
 	
 	TEST_METHOD(52) {

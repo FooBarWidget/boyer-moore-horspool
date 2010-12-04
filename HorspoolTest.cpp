@@ -43,6 +43,8 @@ namespace tut {
 		ensure_equals(find("ab", "1b3456789"), -1);
 		ensure_equals(find("ab", "123b56789"), -1);
 		ensure_equals(find("ab", "12a456789"), -1);
+		ensure_equals(find("ab", "12a45678a"), -1);
+		ensure_equals(find("ab", "12a45678aa"), -1);
 	}
 	
 	TEST_METHOD(3) {
@@ -53,6 +55,8 @@ namespace tut {
 		ensure_equals(find("aa", "a23456789"), -1);
 		ensure_equals(find("aa", "1a3456789"), -1);
 		ensure_equals(find("aa", "12a4a6789"), -1);
+		ensure_equals(find("aa", "12a4a678a"), -1);
+		ensure_equals(find("aa", "12a4a678ba"), -1);
 	}
 	
 	TEST_METHOD(4) {
@@ -98,6 +102,10 @@ namespace tut {
 		ensure_equals(find("ab", "ba1ab456789ab"), 3);
 		ensure_equals(find("ab", "ba12ab56789ab"), 4);
 		ensure_equals(find("ab", "ba123ab6789ab"), 5);
+		
+		ensure_equals(find("ab", "003456789ab"), 9);
+		ensure_equals(find("ab", "100456789aabab"), 10);
+		ensure_equals(find("ab", "120056789abbab"), 9);
 	}
 	
 	TEST_METHOD(12) {
