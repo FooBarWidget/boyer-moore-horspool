@@ -112,11 +112,12 @@ main(int argc, char *argv[]) {
 	sbmh_init(ctx, needle, needle_len);
 	for (i = 0; i < iterations; i++) {
 		sbmh_reset(ctx);
-		sbmh_feed(ctx, needle, needle_len, (const unsigned char *) data.c_str(), data.size());
+		size_t analyzed = sbmh_feed(ctx, needle, needle_len,
+			(const unsigned char *) data.c_str(), data.size());
 		if (ctx->found) {
-			found = ctx->analyzed - needle_len;
+			found = analyzed - needle_len;
 		} else {
-			found = ctx->analyzed;
+			found = analyzed;
 		}
 	}
 	t2 = getTime();

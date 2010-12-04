@@ -83,10 +83,6 @@
  *    - If the needle was already found, then any additional call to sbmh_feed()
  *      will cause it to return 0: nothing in the fed data is analyzed.
  *
- * The 'analyzed' field is used to keep track of the total number of haystack bytes that
- * have been analyzed so far, including those haystack data fed in previous sbmh_feed()
- * calls.
- *
  * There's no need deinitialize the StreamBMH structure. Just free its memory.
  *
  * You can also reuse the StreamBMH structure to find the same needle in a different
@@ -154,7 +150,6 @@ typedef void (*sbmh_data_cb)(const struct StreamBMH *ctx, const unsigned char *d
 
 struct StreamBMH {
 	/***** Public but read-only fields *****/
-	size_t        analyzed;
 	bool          found;
 	
 	/***** Public fields; feel free to populate *****/
@@ -187,7 +182,6 @@ struct StreamBMH {
 void
 sbmh_reset(struct StreamBMH *restrict ctx) {
 	ctx->found = false;
-	ctx->analyzed = 0;
 	ctx->lookbehind_size = 0;
 }
 
@@ -294,7 +288,6 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 			 && sbmh_memcmp(ctx, needle, data, pos, needle_len - 1)) {
 				ctx->found = true;
 				ctx->lookbehind_size = 0;
-				ctx->analyzed += pos + needle_len;
 				if (pos > -ctx->lookbehind_size && ctx->callback != NULL) {
 					ctx->callback(ctx, ctx->lookbehind,
 						ctx->lookbehind_size + pos);
@@ -357,8 +350,6 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 			
 			SBMH_DEBUG1("[sbmh] update lookbehind -> (%s)\n",
 				std::string((const char *) ctx->lookbehind, ctx->lookbehind_size).c_str());
-			
-			ctx->analyzed += len;
 			return len;
 		}
 	}
@@ -382,7 +373,6 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		)) {
 			SBMH_DEBUG1("[sbmh] found at position %d\n", (int) pos);
 			ctx->found = true;
-			ctx->analyzed += pos + needle_len;
 			if (pos > 0 && ctx->callback != NULL) {
 				ctx->callback(ctx, data, pos);
 			}
@@ -423,6 +413,5 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		ctx->callback(ctx, data, std::min(size_t(pos), len));
 	}
 	
-	ctx->analyzed += len;
 	return len;
 }

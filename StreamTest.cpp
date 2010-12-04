@@ -29,12 +29,12 @@ namespace tut {
 			ctx->callback = append_unmatched_data;
 			ctx->user_data = this;
 			
-			sbmh_feed(ctx,
+			size_t analyzed = sbmh_feed(ctx,
 				(const unsigned char *) needle.c_str(), needle.size(),
 				(const unsigned char *) haystack.c_str(), haystack.size());
 			lookbehind.assign((const char *) ctx->lookbehind, ctx->lookbehind_size);
 			if (ctx->found) {
-				return ctx->analyzed - needle.size();
+				return analyzed - needle.size();
 			} else {
 				return -1;
 			}
@@ -50,8 +50,9 @@ namespace tut {
 			ctx->callback = append_unmatched_data;
 			ctx->user_data = this;
 			
+			size_t analyzed = 0;
 			for (string::size_type i = 0; i < haystack.size(); i += chunkSize) {
-				sbmh_feed(ctx,
+				analyzed += sbmh_feed(ctx,
 					(const unsigned char *) needle.c_str(), needle.size(),
 					(const unsigned char *) haystack.c_str() + i,
 					std::min((int) chunkSize, (int) (haystack.size() - i)));
@@ -59,7 +60,7 @@ namespace tut {
 			
 			lookbehind.assign((const char *) ctx->lookbehind, ctx->lookbehind_size);
 			if (ctx->found) {
-				return ctx->analyzed - needle.size();
+				return analyzed - needle.size();
 			} else {
 				return -1;
 			}
