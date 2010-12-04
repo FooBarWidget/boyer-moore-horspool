@@ -27,7 +27,7 @@
  * piece-of-piece in a "streaming" manner.
  *
  * This implementation is optimized for both speed and memory usage.
- * Other than the memory needed for the context structure, it does not need any
+ * Other than the memory needed for the context structure, it does not perform any
  * additional memory allocations (except for minimal usage of the stack). The context
  * structure, which contains the Boyer-Moore-Horspool occurance table and various
  * state information, is is organized in such a way that it can be allocated with a
@@ -52,12 +52,11 @@
  * - You can further tweak this code to favor either memory usage or performance.
  *   See the typedef for sbmh_size_t for more information.
  *
- * Usage:
+ *
+ * == Basic usage
  *
  * 1. Allocate a StreamBMH structure either on the stack (alloca) or on the heap.
  *    It must be at least SBMH_SIZE(needle_len) bytes big.
- *    Do not write to any of StreamBMH's field: they are considered read-only except
- *    for the implementation code.
  *    The maximum supported needle size depends on the definition of sbmh_size_t. See
  *    its typedef for more information.
  *
@@ -85,15 +84,36 @@
  *
  * There's no need deinitialize the StreamBMH structure. Just free its memory.
  *
- * You can also reuse the StreamBMH structure to find the same needle in a different
+ *
+ * == Reuse
+ *
+ * You can reuse the StreamBMH structure for finding the same needle in a different
  * haystack. Call sbmh_reset() to reset all of its internal state except for the
  * Boyer-Moore-Horspool occurance table which contains needle-specific preparation data.
  * You can then call sbmh_feed() to analyze haystack data.
  *
- * Finally, you can reuse an existing StreamBMH structure for finding a different
- * needle. Call sbmh_init() to re-initialize it for use with a different needle.
+ * You can reuse an existing StreamBMH structure for finding a *different* needle
+ * as well. Call sbmh_init() to re-initialize it for use with a different needle.
  * However you must make sure that the StreamBMH structure is at least
  * SBMH_SIZE(new_needle_len) bytes big.
+ *
+ *
+ * == Recognition of non-needle data
+ * 
+ * The 'callback' field in the StreamBMH structure can be used for recogning non-needle
+ * data. This is especially useful for things like multipart MIME parsers where you're
+ * interested in all data except for the needle.
+ *
+ * This callback is initially set to NULL by sbmh_init(). sbmh_reset() does not set it.
+ * When set, sbmh_feed() will call this callback with any data that is determined to not
+ * contain the needle. StreamBMH also has a 'user_data' field. You can set it to any
+ * value for your own use; this code do not use it at all.
+ *
+ * The data passed to the callback can be either part of the data in sbmh_feed()'s
+ * 'data' argument, or it can be part of the StreamBMH lookbehind buffer. If the latter
+ * is the case, then consider the data only valid within the callback: once the
+ * callback has finished, this code can do arbitrary things to the lookbehind buffer,
+ * so to preserve that data you must make your own copy.
  */
 
 /* This implementation is based on sample code originally written by Joel
