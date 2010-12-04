@@ -130,7 +130,10 @@
 #include <cstddef>
 #include <cstring>
 #include <cassert>
+#include <algorithm>
 
+
+struct StreamBMH;
 
 /*
  * sbmh_size_t is a type for representing the needle length. It should be unsigned;
@@ -147,9 +150,18 @@
  */
 typedef unsigned short sbmh_size_t;
 
+typedef void (*sbmh_data_cb)(const struct StreamBMH *ctx, const unsigned char *data, size_t len);
+
 struct StreamBMH {
+	/***** Public but read-only fields *****/
 	size_t        analyzed;
 	bool          found;
+	
+	/***** Public fields; feel free to populate *****/
+	sbmh_data_cb  callback;
+	void         *user_data;
+	
+	/***** Internal fields, do not access. *****/
 	sbmh_size_t   lookbehind_size;
 	sbmh_size_t   occ[256];
 	// Algorithm uses at most needle_len - 1 bytes of space in lookbehind buffer.
@@ -174,6 +186,8 @@ sbmh_init(struct StreamBMH *restrict ctx, const unsigned char *restrict needle,
 	
 	assert(needle_len > 0);
 	sbmh_reset(ctx);
+	ctx->callback = NULL;
+	ctx->user_data = NULL;
 	
 	/* Initialize occurrance table. */
 	for (i = 0; i < 256; i++) {
@@ -264,6 +278,10 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 				ctx->found = true;
 				ctx->lookbehind_size = 0;
 				ctx->analyzed += pos + needle_len;
+				if (pos > -ctx->lookbehind_size && ctx->callback != NULL) {
+					ctx->callback(ctx, ctx->lookbehind,
+						ctx->lookbehind_size + pos);
+				}
 				return pos + needle_len;
 			} else {
 				pos += ctx->occ[ch];
@@ -273,6 +291,9 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		// No match.
 		
 		if (pos >= 0) {
+			if (ctx->callback != NULL) {
+				ctx->callback(ctx, ctx->lookbehind, ctx->lookbehind_size);
+			}
 			ctx->lookbehind_size = 0;
 		} else {
 			/* Cut off part of the lookbehind buffer that has
@@ -280,6 +301,11 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 			 * into it.
 			 */
 			sbmh_size_t bytesToCutOff = sbmh_size_t(ssize_t(ctx->lookbehind_size) + pos);
+			
+			if (bytesToCutOff > 0 && ctx->callback != NULL) {
+				// The cut off data is guaranteed not to contain the needle.
+				ctx->callback(ctx, ctx->lookbehind, bytesToCutOff);
+			}
 			
 			memmove(ctx->lookbehind,
 				ctx->lookbehind + bytesToCutOff,
@@ -290,6 +316,7 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 			memcpy(ctx->lookbehind + ctx->lookbehind_size,
 				data, len);
 			ctx->lookbehind_size += len;
+			
 			ctx->analyzed += len;
 			return len;
 		}
@@ -312,6 +339,9 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		)) {
 			ctx->found = true;
 			ctx->analyzed += pos + needle_len;
+			if (pos > 0 && ctx->callback != NULL) {
+				ctx->callback(ctx, data, pos);
+			}
 			return pos + needle_len;
 		} else {
 			pos += occ[ch];
@@ -337,6 +367,11 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 			memcpy(ctx->lookbehind, data + pos, len - pos);
 			ctx->lookbehind_size = len - pos;
 		}
+	}
+	
+	/* Everything until pos is guaranteed not to contain needle data. */
+	if (pos > 0 && ctx->callback != NULL) {
+		ctx->callback(ctx, data, std::min(size_t(pos), len));
 	}
 	
 	ctx->analyzed += len;

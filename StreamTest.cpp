@@ -9,13 +9,30 @@ using namespace std;
 
 namespace tut {
 	struct StreamTest {
-		static int find(const string &needle, const string &haystack) {
+		string unmatched_data;
+		string lookbehind;
+		
+		static void append_unmatched_data(const struct StreamBMH *ctx,
+			const unsigned char *data, size_t len)
+		{
+			StreamTest *self = (StreamTest *) ctx->user_data;
+			self->unmatched_data.append((const char *) data, len);
+		}
+		
+		int find(const string &needle, const string &haystack) {
 			StreamBMH *ctx = (StreamBMH *) alloca(SBMH_SIZE(needle.size()));
 			
+			unmatched_data.clear();
+			lookbehind.clear();
+			
 			sbmh_init(ctx, (const unsigned char *) needle.c_str(), needle.size());
+			ctx->callback = append_unmatched_data;
+			ctx->user_data = this;
+			
 			sbmh_feed(ctx,
 				(const unsigned char *) needle.c_str(), needle.size(),
 				(const unsigned char *) haystack.c_str(), haystack.size());
+			lookbehind.assign((const char *) ctx->lookbehind, ctx->lookbehind_size);
 			if (ctx->found) {
 				return ctx->analyzed - needle.size();
 			} else {
@@ -23,10 +40,16 @@ namespace tut {
 			}
 		}
 		
-		static int feed_in_chunks_and_find(const string &needle, const string &haystack, int chunkSize = 1) {
+		int feed_in_chunks_and_find(const string &needle, const string &haystack, int chunkSize = 1) {
 			StreamBMH *ctx = (StreamBMH *) alloca(SBMH_SIZE(needle.size()));
 			
+			unmatched_data.clear();
+			lookbehind.clear();
+			
 			sbmh_init(ctx, (const unsigned char *) needle.c_str(), needle.size());
+			ctx->callback = append_unmatched_data;
+			ctx->user_data = this;
+			
 			for (string::size_type i = 0; i < haystack.size(); i += chunkSize) {
 				sbmh_feed(ctx,
 					(const unsigned char *) needle.c_str(), needle.size(),
@@ -34,6 +57,7 @@ namespace tut {
 					std::min((int) chunkSize, (int) (haystack.size() - i)));
 			}
 			
+			lookbehind.assign((const char *) ctx->lookbehind, ctx->lookbehind_size);
 			if (ctx->found) {
 				return ctx->analyzed - needle.size();
 			} else {
@@ -51,7 +75,12 @@ namespace tut {
 			"(1 character) can't be found.");
 		
 		ensure_equals(find("0", "123456789"), -1);
+		ensure_equals(unmatched_data, "123456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("x", "hello world"), -1);
+		ensure_equals(unmatched_data, "hello world");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(2) {
@@ -59,13 +88,40 @@ namespace tut {
 			"(2 different characters) can't be found.");
 		
 		ensure_equals(find("ab", "123456789"), -1);
+		ensure_equals(unmatched_data, "123456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("ab", "a23456789"), -1);
+		ensure_equals(unmatched_data, "a23456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("ab", "1a3456789"), -1);
+		ensure_equals(unmatched_data, "1a3456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("ab", "1b3456789"), -1);
+		ensure_equals(unmatched_data, "1b3456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("ab", "123b56789"), -1);
+		ensure_equals(unmatched_data, "123b56789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("ab", "12a456789"), -1);
+		ensure_equals(unmatched_data, "12a456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("ab", "12a45678a"), -1);
+		ensure_equals(unmatched_data, "12a45678");
+		ensure_equals(lookbehind, "a");
+		
 		ensure_equals(find("ab", "12a45678aa"), -1);
+		ensure_equals(unmatched_data, "12a45678a");
+		ensure_equals(lookbehind, "a");
+		
+		ensure_equals(find("ab", "12a45678b"), -1);
+		ensure_equals(unmatched_data, "12a45678b");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(3) {
@@ -73,11 +129,28 @@ namespace tut {
 			"(2 identical characters) can't be found.");
 		
 		ensure_equals(find("aa", "123456789"), -1);
+		ensure_equals(unmatched_data, "123456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("aa", "a23456789"), -1);
+		ensure_equals(unmatched_data, "a23456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("aa", "1a3456789"), -1);
+		ensure_equals(unmatched_data, "1a3456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("aa", "12a4a6789"), -1);
+		ensure_equals(unmatched_data, "12a4a6789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(find("aa", "12a4a678a"), -1);
+		ensure_equals(unmatched_data, "12a4a678");
+		ensure_equals(lookbehind, "a");
+		
 		ensure_equals(find("aa", "12a4a678ba"), -1);
+		ensure_equals(unmatched_data, "12a4a678b");
+		ensure_equals(lookbehind, "a");
 	}
 	
 	TEST_METHOD(4) {
@@ -166,7 +239,12 @@ namespace tut {
 			"(1 character) can't be found.");
 		
 		ensure_equals(feed_in_chunks_and_find("0", "123456789"), -1);
+		ensure_equals(unmatched_data, "123456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("x", "hello world"), -1);
+		ensure_equals(unmatched_data, "hello world");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(22) {
@@ -174,13 +252,44 @@ namespace tut {
 			"(2 different characters) can't be found.");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "123456789"), -1);
+		ensure_equals(unmatched_data, "123456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "a23456789"), -1);
+		ensure_equals(unmatched_data, "a23456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "1a3456789"), -1);
+		ensure_equals(unmatched_data, "1a3456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "1b3456789"), -1);
+		ensure_equals(unmatched_data, "1b3456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "123b56789"), -1);
+		ensure_equals(unmatched_data, "123b56789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "12a456789"), -1);
+		ensure_equals(unmatched_data, "12a456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "12a45678a"), -1);
+		ensure_equals(unmatched_data, "12a45678");
+		ensure_equals(lookbehind, "a");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "12a45678aa"), -1);
+		ensure_equals(unmatched_data, "12a45678a");
+		ensure_equals(lookbehind, "a");
+		
+		ensure_equals(feed_in_chunks_and_find("ab", "12a45678x"), -1);
+		ensure_equals(unmatched_data, "12a45678x");
+		ensure_equals(lookbehind, "");
+		
+		ensure_equals(feed_in_chunks_and_find("ab", "12a45678b"), -1);
+		ensure_equals(unmatched_data, "12a45678b");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(23) {
@@ -188,11 +297,28 @@ namespace tut {
 			"(2 identical characters) can't be found.");
 		
 		ensure_equals(feed_in_chunks_and_find("aa", "123456789"), -1);
+		ensure_equals(unmatched_data, "123456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("aa", "a23456789"), -1);
+		ensure_equals(unmatched_data, "a23456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("aa", "1a3456789"), -1);
+		ensure_equals(unmatched_data, "1a3456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("aa", "12a4a6789"), -1);
+		ensure_equals(unmatched_data, "12a4a6789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "12a45678a"), -1);
+		ensure_equals(unmatched_data, "12a45678");
+		ensure_equals(lookbehind, "a");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "12a45678aa"), -1);
+		ensure_equals(unmatched_data, "12a45678a");
+		ensure_equals(lookbehind, "a");
 	}
 	
 	TEST_METHOD(24) {
@@ -282,7 +408,12 @@ namespace tut {
 			"(1 character) can't be found.");
 		
 		ensure_equals(feed_in_chunks_and_find("0", "123456789", 3), -1);
+		ensure_equals(unmatched_data, "123456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("x", "hello world", 3), -1);
+		ensure_equals(unmatched_data, "hello world");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(42) {
@@ -290,13 +421,44 @@ namespace tut {
 			"(2 different characters) can't be found.");
 		
 		ensure_equals(feed_in_chunks_and_find("ab", "123456789", 3), -1);
+		ensure_equals(unmatched_data, "123456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "a23456789", 3), -1);
+		ensure_equals(unmatched_data, "a23456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "1a3456789", 3), -1);
+		ensure_equals(unmatched_data, "1a3456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "1b3456789", 3), -1);
+		ensure_equals(unmatched_data, "1b3456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "123b56789", 3), -1);
+		ensure_equals(unmatched_data, "123b56789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "12a456789", 3), -1);
+		ensure_equals(unmatched_data, "12a456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "12a45678a", 3), -1);
+		ensure_equals(unmatched_data, "12a45678");
+		ensure_equals(lookbehind, "a");
+		
 		ensure_equals(feed_in_chunks_and_find("ab", "12a45678aa", 3), -1);
+		ensure_equals(unmatched_data, "12a45678a");
+		ensure_equals(lookbehind, "a");
+		
+		ensure_equals(feed_in_chunks_and_find("ab", "12a45678x", 3), -1);
+		ensure_equals(unmatched_data, "12a45678x");
+		ensure_equals(lookbehind, "");
+		
+		ensure_equals(feed_in_chunks_and_find("ab", "12a45678b", 3), -1);
+		ensure_equals(unmatched_data, "12a45678b");
+		ensure_equals(lookbehind, "");
 	}
 	
 	TEST_METHOD(43) {
@@ -304,11 +466,28 @@ namespace tut {
 			"(2 identical characters) can't be found.");
 		
 		ensure_equals(feed_in_chunks_and_find("aa", "123456789", 3), -1);
+		ensure_equals(unmatched_data, "123456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("aa", "a23456789", 3), -1);
+		ensure_equals(unmatched_data, "a23456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("aa", "1a3456789", 3), -1);
+		ensure_equals(unmatched_data, "1a3456789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("aa", "12a4a6789", 3), -1);
+		ensure_equals(unmatched_data, "12a4a6789");
+		ensure_equals(lookbehind, "");
+		
 		ensure_equals(feed_in_chunks_and_find("aa", "12a4a678a", 3), -1);
+		ensure_equals(unmatched_data, "12a4a678");
+		ensure_equals(lookbehind, "a");
+		
 		ensure_equals(feed_in_chunks_and_find("aa", "12a4a678ba", 3), -1);
+		ensure_equals(unmatched_data, "12a4a678b");
+		ensure_equals(lookbehind, "a");
 	}
 	
 	TEST_METHOD(44) {
