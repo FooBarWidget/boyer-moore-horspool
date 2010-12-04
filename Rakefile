@@ -22,7 +22,7 @@ file 'test' => ['HorspoolTest.o', 'StreamTest.o', 'TestMain.o'] do
 end
 
 desc "Build benchmark runner"
-file 'benchmark' => ['benchmark.cpp', 'Horspool.cpp', 'StreamBoyerMooreHorspool.cpp'] do
+file 'benchmark' => ['benchmark.cpp', 'Horspool.cpp', 'BoyerMooreAndTurbo.cpp', 'StreamBoyerMooreHorspool.cpp'] do
 	sh "g++ #{CXXFLAGS} #{OPTIMIZE_FLAGS} benchmark.cpp -o benchmark"
 end
 
