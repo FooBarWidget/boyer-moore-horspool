@@ -109,8 +109,9 @@ main(int argc, char *argv[]) {
 	
 	t1 = getTime();
 	StreamBMH *ctx = (StreamBMH *) alloca(SBMH_SIZE(needle_len));
+	sbmh_init(ctx, needle, needle_len);
 	for (i = 0; i < iterations; i++) {
-		sbmh_init(ctx, needle, needle_len);
+		sbmh_reset(ctx);
 		sbmh_feed(ctx, needle, needle_len, (const unsigned char *) data.c_str(), data.size());
 		if (ctx->found) {
 			found = ctx->analyzed - needle_len;

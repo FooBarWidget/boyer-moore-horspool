@@ -304,6 +304,7 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 		
 		if (unlikely(
 		        unlikely( ch == last_needle_char )
+		     && unlikely( *(data + pos) == needle[0] )
 		     && unlikely( memcmp(needle, data + pos, needle_len - 1) == 0 )
 		)) {
 			ctx->found = true;
