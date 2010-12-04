@@ -172,6 +172,7 @@ sbmh_init(struct StreamBMH *restrict ctx, const unsigned char *restrict needle,
 {
 	sbmh_size_t i;
 	
+	assert(needle_len > 0);
 	sbmh_reset(ctx);
 	
 	/* Initialize occurrance table. */
