@@ -2,6 +2,8 @@ Introduction
 ============
 This repository contains various C++ implementations of the Boyer-Moore string search algorithm and derivative algorithms. These family of algorithms allow fast searching of substrings, much faster than `strstr()` and `memmem()`. The longer the substring, the faster the algorithms work. The implementations are written to be both efficient and minimalist so that you can easily incorporate them in your own code.
 
+This blog post has more information: http://blog.phusion.nl/2010/12/06/efficient-substring-searching/
+
 
 Files
 -----
