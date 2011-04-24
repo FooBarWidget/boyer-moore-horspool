@@ -87,6 +87,18 @@
  *
  * There's no need deinitialize the StreamBMH structure. Just free its memory.
  *
+ * There's a convenience macro, SBMH_ALLOC_AND_INIT(), for combining steps 1 and 2.
+ * It accepts a NULL-terminated needle and allocates the StreamBMH structure using
+ * malloc():
+ *
+ *   struct StreamBMH *ctx;
+ *   SBMH_ALLOC_AND_INIT(ctx, "my needle");
+ *   if (ctx == NULL) {
+ *      // error...
+ *   }
+ *   ...
+ *   free(ctx);
+ *
  *
  * == Reuse
  *
@@ -189,6 +201,12 @@ struct StreamBMH {
 };
 
 #define SBMH_SIZE(needle_len) (sizeof(struct StreamBMH) + (needle_len) - 1)
+#define SBMH_ALLOC_AND_INIT(sbmh, needle) \
+	do { \
+		size_t needle_len = strlen(needle); \
+		sbmh = (struct StreamBMH *) malloc(SBMH_SIZE(needle_len)); \
+		sbmh_init(sbmh, needle, needle_len); \
+	} while (false)
 
 #if 0
 	#include <string>
