@@ -203,9 +203,9 @@ struct StreamBMH {
 #define SBMH_SIZE(needle_len) (sizeof(struct StreamBMH) + (needle_len) - 1)
 #define SBMH_ALLOC_AND_INIT(sbmh, needle) \
 	do { \
-		size_t needle_len = strlen(needle); \
+		size_t needle_len = strlen((const char *) needle); \
 		sbmh = (struct StreamBMH *) malloc(SBMH_SIZE(needle_len)); \
-		sbmh_init(sbmh, needle, needle_len); \
+		sbmh_init(sbmh, (const unsigned char *) needle, needle_len); \
 	} while (false)
 
 #if 0
@@ -233,6 +233,7 @@ sbmh_init(struct StreamBMH *restrict ctx, const unsigned char *restrict needle,
 	sbmh_size_t needle_len)
 {
 	sbmh_size_t i;
+	unsigned int j;
 	
 	assert(needle_len > 0);
 	sbmh_reset(ctx);
@@ -240,8 +241,8 @@ sbmh_init(struct StreamBMH *restrict ctx, const unsigned char *restrict needle,
 	ctx->user_data = NULL;
 	
 	/* Initialize occurrance table. */
-	for (i = 0; i < 256; i++) {
-		ctx->occ[i] = needle_len;
+	for (j = 0; j < 256; j++) {
+		ctx->occ[j] = needle_len;
 	}
 	
 	/* Populate occurance table with analysis of the needle,
