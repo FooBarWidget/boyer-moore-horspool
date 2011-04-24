@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2010 Phusion v.o.f.
+ * https://github.com/FooBarWidget/boyer-moore-horspool
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
