@@ -270,22 +270,27 @@ sbmh_init(struct StreamBMH *restrict ctx, struct StreamBMH_Occ *restrict occ,
 	sbmh_size_t i;
 	unsigned int j;
 	
-	assert(needle_len > 0);
-	sbmh_reset(ctx);
-	ctx->callback = NULL;
-	ctx->user_data = NULL;
-	
-	/* Initialize occurrance table. */
-	for (j = 0; j < 256; j++) {
-		occ->occ[j] = needle_len;
+	if (ctx != NULL) {
+		sbmh_reset(ctx);
+		ctx->callback = NULL;
+		ctx->user_data = NULL;
 	}
 	
-	/* Populate occurance table with analysis of the needle,
-	 * ignoring last letter.
-	 */
-	if (needle_len >= 1) {
-		for (i = 0; i < needle_len - 1; i++) {
-			occ->occ[needle[i]] = needle_len - 1 - i;
+	if (occ != NULL) {
+		assert(needle_len > 0);
+		
+		/* Initialize occurrance table. */
+		for (j = 0; j < 256; j++) {
+			occ->occ[j] = needle_len;
+		}
+		
+		/* Populate occurance table with analysis of the needle,
+		 * ignoring last letter.
+		 */
+		if (needle_len >= 1) {
+			for (i = 0; i < needle_len - 1; i++) {
+				occ->occ[needle[i]] = needle_len - 1 - i;
+			}
 		}
 	}
 }
