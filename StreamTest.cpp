@@ -21,15 +21,16 @@ namespace tut {
 		
 		int find(const string &needle, const string &haystack) {
 			StreamBMH *ctx = (StreamBMH *) alloca(SBMH_SIZE(needle.size()));
+			StreamBMH_Occ occ;
 			
 			unmatched_data.clear();
 			lookbehind.clear();
 			
-			sbmh_init(ctx, (const unsigned char *) needle.c_str(), needle.size());
+			sbmh_init(ctx, &occ, (const unsigned char *) needle.c_str(), needle.size());
 			ctx->callback = append_unmatched_data;
 			ctx->user_data = this;
 			
-			size_t analyzed = sbmh_feed(ctx,
+			size_t analyzed = sbmh_feed(ctx, &occ,
 				(const unsigned char *) needle.c_str(), needle.size(),
 				(const unsigned char *) haystack.c_str(), haystack.size());
 			lookbehind.assign((const char *) ctx->lookbehind, ctx->lookbehind_size);
@@ -42,17 +43,18 @@ namespace tut {
 		
 		int feed_in_chunks_and_find(const string &needle, const string &haystack, int chunkSize = 1) {
 			StreamBMH *ctx = (StreamBMH *) alloca(SBMH_SIZE(needle.size()));
+			StreamBMH_Occ occ;
 			
 			unmatched_data.clear();
 			lookbehind.clear();
 			
-			sbmh_init(ctx, (const unsigned char *) needle.c_str(), needle.size());
+			sbmh_init(ctx, &occ, (const unsigned char *) needle.c_str(), needle.size());
 			ctx->callback = append_unmatched_data;
 			ctx->user_data = this;
 			
 			size_t analyzed = 0;
 			for (string::size_type i = 0; i < haystack.size(); i += chunkSize) {
-				analyzed += sbmh_feed(ctx,
+				analyzed += sbmh_feed(ctx, &occ,
 					(const unsigned char *) needle.c_str(), needle.size(),
 					(const unsigned char *) haystack.c_str() + i,
 					std::min((int) chunkSize, (int) (haystack.size() - i)));

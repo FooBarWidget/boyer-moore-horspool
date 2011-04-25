@@ -185,6 +185,10 @@ typedef unsigned short sbmh_size_t;
 
 typedef void (*sbmh_data_cb)(const struct StreamBMH *ctx, const unsigned char *data, size_t len);
 
+struct StreamBMH_Occ {
+	sbmh_size_t occ[256];
+};
+
 struct StreamBMH {
 	/***** Public but read-only fields *****/
 	bool          found;
@@ -195,7 +199,6 @@ struct StreamBMH {
 	
 	/***** Internal fields, do not access. *****/
 	sbmh_size_t   lookbehind_size;
-	sbmh_size_t   occ[256];
 	// Algorithm uses at most needle_len - 1 bytes of space in lookbehind buffer.
 	unsigned char lookbehind[];
 };
@@ -229,8 +232,8 @@ sbmh_reset(struct StreamBMH *restrict ctx) {
 }
 
 inline void
-sbmh_init(struct StreamBMH *restrict ctx, const unsigned char *restrict needle,
-	sbmh_size_t needle_len)
+sbmh_init(struct StreamBMH *restrict ctx, struct StreamBMH_Occ *restrict occ,
+	const unsigned char *restrict needle, sbmh_size_t needle_len)
 {
 	sbmh_size_t i;
 	unsigned int j;
@@ -242,7 +245,7 @@ sbmh_init(struct StreamBMH *restrict ctx, const unsigned char *restrict needle,
 	
 	/* Initialize occurrance table. */
 	for (j = 0; j < 256; j++) {
-		ctx->occ[j] = needle_len;
+		occ->occ[j] = needle_len;
 	}
 	
 	/* Populate occurance table with analysis of the needle,
@@ -250,7 +253,7 @@ sbmh_init(struct StreamBMH *restrict ctx, const unsigned char *restrict needle,
 	 */
 	if (needle_len >= 1) {
 		for (i = 0; i < needle_len - 1; i++) {
-			ctx->occ[needle[i]] = needle_len - 1 - i;
+			occ->occ[needle[i]] = needle_len - 1 - i;
 		}
 	}
 }
@@ -268,7 +271,8 @@ sbmh_lookup_char(const struct StreamBMH *restrict ctx,
 
 inline bool
 sbmh_memcmp(const struct StreamBMH *restrict ctx,
-	const unsigned char *restrict needle, const unsigned char *restrict data,
+	const unsigned char *restrict needle,
+	const unsigned char *restrict data,
 	ssize_t pos, sbmh_size_t len)
 {
 	ssize_t i = 0;
@@ -287,7 +291,7 @@ sbmh_memcmp(const struct StreamBMH *restrict ctx,
 }
 
 inline size_t
-sbmh_feed(struct StreamBMH *restrict ctx,
+sbmh_feed(struct StreamBMH *restrict ctx, const struct StreamBMH_Occ *restrict occtable,
 	const unsigned char *restrict needle, sbmh_size_t needle_len,
 	const unsigned char *restrict data, size_t len)
 {
@@ -304,7 +308,7 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 	 */
 	ssize_t pos = -ctx->lookbehind_size;
 	unsigned char last_needle_char = needle[needle_len - 1];
-	const sbmh_size_t *occ = ctx->occ;
+	const sbmh_size_t *occ = occtable->occ;
 	
 	if (pos < 0) {
 		SBMH_DEBUG2("[sbmh] considering lookbehind: (%s)(%s)\n",
@@ -340,7 +344,7 @@ sbmh_feed(struct StreamBMH *restrict ctx,
 					int(pos + needle_len));
 				return pos + needle_len;
 			} else {
-				pos += ctx->occ[ch];
+				pos += occ[ch];
 			}
 		}
 		
