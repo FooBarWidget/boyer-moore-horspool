@@ -196,6 +196,8 @@
 #include <algorithm>
 
 
+// namespace Passenger {
+
 struct StreamBMH;
 
 /*
@@ -493,5 +495,7 @@ sbmh_feed(struct StreamBMH *restrict ctx, const struct StreamBMH_Occ *restrict o
 	
 	return len;
 }
+
+// } // namespace Passenger
 
 #endif /* _STREAM_BOYER_MOORE_HORSPOOL_ */
