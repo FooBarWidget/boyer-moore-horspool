@@ -115,7 +115,7 @@
  *
  * == Recognition of non-needle data
  * 
- * The 'callback' field in the StreamBMH structure can be used for recogning non-needle
+ * The 'callback' field in the StreamBMH structure can be used for recognizing non-needle
  * data. This is especially useful for things like multipart MIME parsers where you're
  * interested in all data except for the needle.
  *
