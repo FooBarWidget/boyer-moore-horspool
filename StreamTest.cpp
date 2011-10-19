@@ -33,7 +33,7 @@ namespace tut {
 			size_t analyzed = sbmh_feed(ctx, &occ,
 				(const unsigned char *) needle.c_str(), needle.size(),
 				(const unsigned char *) haystack.c_str(), haystack.size());
-			lookbehind.assign((const char *) ctx->lookbehind, ctx->lookbehind_size);
+			lookbehind.assign((const char *) _SBMH_LOOKBEHIND(ctx), ctx->lookbehind_size);
 			if (ctx->found) {
 				return analyzed - needle.size();
 			} else {
@@ -60,7 +60,7 @@ namespace tut {
 					std::min((int) chunkSize, (int) (haystack.size() - i)));
 			}
 			
-			lookbehind.assign((const char *) ctx->lookbehind, ctx->lookbehind_size);
+			lookbehind.assign((const char *) _SBMH_LOOKBEHIND(ctx), ctx->lookbehind_size);
 			if (ctx->found) {
 				return analyzed - needle.size();
 			} else {
