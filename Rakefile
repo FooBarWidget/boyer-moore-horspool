@@ -1,4 +1,4 @@
-CXXFLAGS = "-Wall -g"
+CXXFLAGS = "-Wall -Wextra -g"
 OPTIMIZE_FLAGS = "-O2"
 BENCHMARK_INPUT_SIZE = 200 * 1024 * 1024
 
