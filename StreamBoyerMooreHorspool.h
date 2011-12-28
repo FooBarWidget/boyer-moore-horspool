@@ -204,13 +204,13 @@ struct StreamBMH;
  * sbmh_size_t is a type for representing the needle length. It should be unsigned;
  * it makes no sense for it not to be.
  * By default it's typedef'ed to 'unsigned short', which is a 16-bit integer on most
- * platforms, allowing us to support needles up to about 64 KB. This ough to be enough
+ * platforms, allowing us to support needles up to about 64 KB. This ought to be enough
  * for most people. In the odd situation that you're dealing with extremely large
  * needles, you can typedef this to 'unsigned int' or even 'unsigned long long'.
  *
  * Its typedef slightly affects performance. Benchmarks on OS X Snow Leopard (x86_64)
  * have shown that typedeffing this to size_t (64-bit integer) makes the benchmark
- * 4-8% faster at the cost of 4 times more memory usage per StreamBMH structure.
+ * 4-8% faster at the cost of 4 times more memory usage per StreamBMH_Occ structure.
  * Consider changing the typedef depending on your needs.
  */
 typedef unsigned short sbmh_size_t;
