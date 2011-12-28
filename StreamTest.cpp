@@ -302,6 +302,7 @@ namespace tut {
 		ensure_equals(find("hello", "helo world"), -1);
 		ensure_equals(find("hello world!", "oh my, hello world"), -1);
 		ensure_equals(find("hello world!", "oh my, hello world!! again, hello world!!"), 7);
+		ensure_equals(find("abcb", "ababcb"), 2);
 		
 		ensure_equals(find("\r\n--boundary\r\n",
 			"some binary data\r\n"
