@@ -1,6 +1,7 @@
 #include "tut_reporter.h"
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <stdexcept>
 

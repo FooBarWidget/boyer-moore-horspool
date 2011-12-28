@@ -25,6 +25,7 @@
  */
 
 #include <vector>
+#include <cstring>
  
 typedef std::vector<size_t> occtable_type;
 
