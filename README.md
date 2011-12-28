@@ -37,7 +37,7 @@ You need Ruby and Rake. To compile the unit tests:
 
 To run the benchmarks:
 
-    rake run_benchmarks
+    rake run_benchmark
 
 
 Which algorithm to use?
