@@ -8,7 +8,7 @@ typedef std::vector<size_t> skiptable_type;
  * of both strings.
  * It is an utility function used by the actual Boyer-Moore algorithms.
  */
-const size_t backwards_match_len(
+size_t backwards_match_len(
     const unsigned char* ptr1,
     const unsigned char* ptr2,
     size_t strlen,
@@ -98,7 +98,7 @@ const skiptable_type
 /* If it finds the needle, it returns an offset to haystack from which
  * the needle was found. Otherwise, it returns haystack_length.
  */
-const size_t SearchIn(const unsigned char* haystack, const size_t haystack_length,
+size_t SearchIn(const unsigned char* haystack, size_t haystack_length,
     const occtable_type& occ,
     const skiptable_type& skip,
     const unsigned char* needle,
@@ -110,7 +110,7 @@ const size_t SearchIn(const unsigned char* haystack, const size_t haystack_lengt
     {
         const unsigned char* result =
             (const unsigned char*)std::memchr(haystack, *needle, haystack_length);
-        return result ? result-haystack : haystack_length;
+        return result ? size_t(result-haystack) : haystack_length;
     }
  
     const size_t needle_length_minus_1 = needle_length-1;
@@ -146,7 +146,7 @@ const size_t SearchIn(const unsigned char* haystack, const size_t haystack_lengt
 /* If it finds the needle, it returns an offset to haystack from which
  * the needle was found. Otherwise, it returns haystack_length.
  */
-const size_t SearchInTurbo(const unsigned char* haystack, const size_t haystack_length,
+size_t SearchInTurbo(const unsigned char* haystack, size_t haystack_length,
     const occtable_type& occ,
     const skiptable_type& skip,
     const unsigned char* needle,
@@ -158,7 +158,7 @@ const size_t SearchInTurbo(const unsigned char* haystack, const size_t haystack_
     {
         const unsigned char* result =
             (const unsigned char*)std::memchr(haystack, *needle, haystack_length);
-        return result ? result-haystack : haystack_length;
+        return result ? size_t(result-haystack) : haystack_length;
     }
  
     const size_t needle_length_minus_1 = needle_length-1;

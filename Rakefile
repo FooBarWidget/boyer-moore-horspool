@@ -1,3 +1,4 @@
+CXX = ENV['CXX'] || "g++"
 CXXFLAGS = "-Wall -Wextra -g"
 OPTIMIZE_FLAGS = "-O2"
 BENCHMARK_INPUT_SIZE = 200 * 1024 * 1024
@@ -5,25 +6,25 @@ BENCHMARK_INPUT_SIZE = 200 * 1024 * 1024
 task :default => ['test', 'benchmark']
 
 file 'HorspoolTest.o' => ['HorspoolTest.cpp', 'Horspool.cpp'] do
-	sh "g++ #{CXXFLAGS} -c HorspoolTest.cpp -o HorspoolTest.o"
+	sh "#{CXX} #{CXXFLAGS} -c HorspoolTest.cpp -o HorspoolTest.o"
 end
 
 file 'StreamTest.o' => ['StreamTest.cpp', 'StreamBoyerMooreHorspool.h'] do
-	sh "g++ #{CXXFLAGS} -c StreamTest.cpp -o StreamTest.o"
+	sh "#{CXX} #{CXXFLAGS} -c StreamTest.cpp -o StreamTest.o"
 end
 
 file 'TestMain.o' => 'TestMain.cpp' do
-	sh "g++ #{CXXFLAGS} -c TestMain.cpp -o TestMain.o"
+	sh "#{CXX} #{CXXFLAGS} -c TestMain.cpp -o TestMain.o"
 end
 
 desc "Build test runner"
 file 'test' => ['HorspoolTest.o', 'StreamTest.o', 'TestMain.o'] do
-	sh "g++ #{CXXFLAGS} HorspoolTest.o StreamTest.o TestMain.o -o test"
+	sh "#{CXX} #{CXXFLAGS} HorspoolTest.o StreamTest.o TestMain.o -o test"
 end
 
 desc "Build benchmark runner"
 file 'benchmark' => ['benchmark.cpp', 'Horspool.cpp', 'BoyerMooreAndTurbo.cpp', 'StreamBoyerMooreHorspool.h'] do
-	sh "g++ #{CXXFLAGS} #{OPTIMIZE_FLAGS} benchmark.cpp -o benchmark"
+	sh "#{CXX} #{CXXFLAGS} #{OPTIMIZE_FLAGS} benchmark.cpp -o benchmark"
 end
 
 file 'benchmark_input/newlines.txt' do

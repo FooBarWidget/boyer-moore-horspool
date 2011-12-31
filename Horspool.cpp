@@ -51,7 +51,7 @@ const occtable_type
 /* If it finds the needle, it returns an offset to haystack from which
  * the needle was found. Otherwise, it returns haystack_length.
  */
-const size_t SearchInHorspool(const unsigned char* haystack, const size_t haystack_length,
+size_t SearchInHorspool(const unsigned char* haystack, size_t haystack_length,
     const occtable_type& occ,
     const unsigned char* needle,
     const size_t needle_length)
@@ -60,7 +60,7 @@ const size_t SearchInHorspool(const unsigned char* haystack, const size_t haysta
     if(needle_length == 1)
     {
         const unsigned char* result = (const unsigned char*)std::memchr(haystack, *needle, haystack_length);
-        return result ? result-haystack : haystack_length;
+        return result ? size_t(result-haystack) : haystack_length;
     }
  
     const size_t needle_length_minus_1 = needle_length-1;

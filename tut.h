@@ -69,9 +69,15 @@ static int setenv(const char *name, const char *value, int override) {
 	typedef factory::object object; \
 	factory name## _group(#name)
 
-#define TEST_METHOD(i) \
-	template<> template<> \
-	void object::test<i>()
+#ifdef __clang__
+	#define TEST_METHOD(i) \
+		template<> \
+		void object::test<i>()
+#else
+	#define TEST_METHOD(i) \
+		template<> template<> \
+		void object::test<i>()
+#endif
 
 /**
  * Template Unit Tests Framework for C++.
@@ -1100,6 +1106,7 @@ private:
                 test_result::ex_ctor, ex);
             return tr;
         }
+        /*
         catch (const std::exception& ex)
         {
             // test failed with std::exception
@@ -1122,6 +1129,7 @@ private:
                 test_result::ex);
             return tr;
         }
+        */
 
         // test passed
         test_result tr(name_,ti->first, current_test_name, test_result::ok);
