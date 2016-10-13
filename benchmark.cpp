@@ -33,7 +33,7 @@ memmem2(const char *haystack, size_t haystack_len, const char *needle, size_t ne
 			} else if (memcmp(result, needle, needle_len) == 0) {
 				return result;
 			} else {
-				ssize_t new_len = ssize_t(haystack_len) - (result - haystack) - 1;
+				int new_len = int(haystack_len) - (result - haystack) - 1;
 				if (new_len <= 0) {
 					return NULL;
 				} else {

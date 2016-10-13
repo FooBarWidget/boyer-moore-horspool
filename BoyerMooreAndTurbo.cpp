@@ -41,18 +41,18 @@ const skiptable_type
  
     const size_t needle_length_minus_1 = needle_length-1;
  
-    std::vector<ssize_t> suff(needle_length);
+    std::vector<int> suff(needle_length);
  
     suff[needle_length_minus_1] = needle_length;
  
-    ssize_t f = 0;
-    ssize_t g = needle_length_minus_1;
+    int f = 0;
+    int g = needle_length_minus_1;
     size_t j = 0; // index for writing into skip[]
-    for(ssize_t i = needle_length-2; i >= 0; --i) // For each suffix length
+    for(int i = needle_length-2; i >= 0; --i) // For each suffix length
     {
         if(i > g)
         {
-            const ssize_t tmp = suff[i + needle_length_minus_1 - f];
+            const int tmp = suff[i + needle_length_minus_1 - f];
             if (tmp < i - g)
             {
                 suff[i] = tmp;
@@ -131,8 +131,8 @@ size_t SearchIn(const unsigned char* haystack, size_t haystack_length,
  
         const unsigned char occ_char = haystack[haystack_position + mismatch_position];
  
-        const ssize_t bcShift = occ[occ_char] - match_len;
-        const ssize_t gcShift = skip[mismatch_position];
+        const int bcShift = occ[occ_char] - match_len;
+        const int gcShift = skip[mismatch_position];
  
         size_t shift = std::max(gcShift, bcShift);
  
@@ -204,11 +204,11 @@ size_t SearchInTurbo(const unsigned char* haystack, size_t haystack_length,
  
         const unsigned char occ_char = haystack[haystack_position + mismatch_position];
  
-        const ssize_t bcShift = occ[occ_char] - match_len;
+        const int bcShift = occ[occ_char] - match_len;
         const size_t gcShift  = skip[mismatch_position];
-        const ssize_t turboShift = ignore_num - match_len;
+        const int turboShift = ignore_num - match_len;
  
-        shift = std::max(std::max((ssize_t)gcShift, bcShift), turboShift);
+        shift = std::max(std::max((int)gcShift, bcShift), turboShift);
  
         if(shift == gcShift)
             ignore_num = std::min( needle_length - shift, match_len);
