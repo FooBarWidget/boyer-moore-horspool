@@ -302,7 +302,7 @@ sbmh_init(struct StreamBMH *restrict ctx, struct StreamBMH_Occ *restrict occ,
 
 inline char
 sbmh_lookup_char(const struct StreamBMH *restrict ctx,
-	const unsigned char *restrict data, ssize_t pos)
+	const unsigned char *restrict data, int pos)
 {
 	if (pos < 0) {
 		return _SBMH_LOOKBEHIND(ctx)[ctx->lookbehind_size + pos];
@@ -315,11 +315,11 @@ inline bool
 sbmh_memcmp(const struct StreamBMH *restrict ctx,
 	const unsigned char *restrict needle,
 	const unsigned char *restrict data,
-	ssize_t pos, sbmh_size_t len)
+	int pos, sbmh_size_t len)
 {
-	ssize_t i = 0;
+	int i = 0;
 	
-	while (i < ssize_t(len)) {
+	while (i < int(len)) {
 		unsigned char data_ch = sbmh_lookup_char(ctx, data, pos + i);
 		unsigned char needle_ch = needle[i];
 		
@@ -348,7 +348,7 @@ sbmh_feed(struct StreamBMH *restrict ctx, const struct StreamBMH_Occ *restrict o
 	 * Negative: points to a position in the lookbehind buffer
 	 *           pos == -2 points to lookbehind[lookbehind_size - 2]
 	 */
-	ssize_t pos = -ctx->lookbehind_size;
+	int pos = -ctx->lookbehind_size;
 	unsigned char last_needle_char = needle[needle_len - 1];
 	const sbmh_size_t *occ = occtable->occ;
 	unsigned char *lookbehind = _SBMH_LOOKBEHIND(ctx);
@@ -371,7 +371,7 @@ sbmh_feed(struct StreamBMH *restrict ctx, const struct StreamBMH_Occ *restrict o
 		 * or until
 		 *   the character to look at lies outside the haystack.
 		 */
-		while (pos < 0 && pos <= ssize_t(len) - ssize_t(needle_len)) {
+		while (pos < 0 && pos <= int(len) - int(needle_len)) {
 			 unsigned char ch = sbmh_lookup_char(ctx, data,
 				pos + needle_len - 1);
 			
@@ -422,7 +422,7 @@ sbmh_feed(struct StreamBMH *restrict ctx, const struct StreamBMH_Occ *restrict o
 			 * been processed and append the entire haystack
 			 * into it.
 			 */
-			sbmh_size_t bytesToCutOff = sbmh_size_t(ssize_t(ctx->lookbehind_size) + pos);
+			sbmh_size_t bytesToCutOff = sbmh_size_t(int(ctx->lookbehind_size) + pos);
 			
 			if (bytesToCutOff > 0 && ctx->callback != NULL) {
 				// The cut off data is guaranteed not to contain the needle.
@@ -434,7 +434,7 @@ sbmh_feed(struct StreamBMH *restrict ctx, const struct StreamBMH_Occ *restrict o
 				ctx->lookbehind_size - bytesToCutOff);
 			ctx->lookbehind_size -= bytesToCutOff;
 			
-			assert(ssize_t(ctx->lookbehind_size + len) < ssize_t(needle_len));
+			assert(int(ctx->lookbehind_size + len) < int(needle_len));
 			memcpy(lookbehind + ctx->lookbehind_size,
 				data, len);
 			ctx->lookbehind_size += len;
@@ -454,7 +454,7 @@ sbmh_feed(struct StreamBMH *restrict ctx, const struct StreamBMH_Occ *restrict o
 	 * search with optimized character lookup code that only considers
 	 * the current round's haystack data.
 	 */
-	while (likely( pos <= ssize_t(len) - ssize_t(needle_len) )) {
+	while (likely( pos <= int(len) - int(needle_len) )) {
 		unsigned char ch = data[pos + needle_len - 1];
 		
 		if (unlikely(
